@@ -5,6 +5,7 @@ require 'tty-prompt'
 # Available commands for the toy_robot CLI
 class CLI
   COMMAND_PROMPT = 'Select a command to send to the robot'
+  PLACE_PROMPT = 'Where on the board do you want to place the robot? (format: X,Y,DIRECTION)'
   QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
   PLACE_COMMAND = 'PLACE'
   QUIT_COMMAND = 'QUIT'
