@@ -2,8 +2,14 @@
 
 require 'spec_helper'
 require './app/controllers/robots_controller'
+require './app/repositories/robot_repository'
+require './app/data_stores/env_data_store'
 
 describe RobotsController do
+  before do
+    ENV.delete(EnvDataStore::STATE_ENV_VAR)
+  end
+
   describe '#place' do
     subject(:place) { described_class.new(params).place }
 
@@ -52,7 +58,7 @@ describe RobotsController do
     context 'when all params are valid' do
       let(:x_coordinate) { Faker::Number.number }
       let(:y_coordinate) { Faker::Number.number }
-      let(:direction) { Faker::Compass.cardinal }
+      let(:direction) { Faker::Compass.cardinal.upcase }
       let(:params) { "#{x_coordinate},#{y_coordinate},#{direction}" }
 
       it 'is successful' do
@@ -60,7 +66,8 @@ describe RobotsController do
       end
 
       it 'places the robot' do
-        result = RobotRepository.find
+        place
+        robot = RobotRepository.new(EnvDataStore.new).find
 
         expect(robot.value!).to be_a(Robot)
       end
