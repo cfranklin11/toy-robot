@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 gem 'dry-monads'
 gem 'faker'
+gem 'pry'
 gem 'rspec'
 gem 'rubocop'
 gem 'tty-prompt'
