@@ -84,7 +84,7 @@ describe RobotsController do
       end
 
       it 'returns a list of error messages' do
-        expect(place.failure.value).to match(an_array_containing([be_a(String)]))
+        expect(place.failure.value).to match(an_array_matching([be_a(String)]))
       end
     end
   end

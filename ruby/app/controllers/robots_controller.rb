@@ -2,6 +2,9 @@
 
 require 'dry/monads'
 
+require './app/repositories/robot_repository'
+require './app/models/robot'
+
 # Controller for handling robot command inputs
 class RobotsController
   include Dry::Monads[:result, :validated, :list, :do]
@@ -14,11 +17,12 @@ class RobotsController
   end
 
   def place
-    yield List::Validated[
-      _validate_param_presence,
-      _validate_x_coordinate_type,
-      _validate_y_coordinate_type
-    ].traverse.to_result
+    _place_params
+      .then(&method(:_validate_params))
+      .fmap { _convert_to_robot_attributes }
+      .fmap { |robot_attrs| ::Robot.new(**robot_attrs) }
+      .fmap { |robot| yield robot.validate }
+      .fmap(::RobotRepository.new(::EnvDataStore.new).method(:place))
   end
 
   private
@@ -28,17 +32,27 @@ class RobotsController
     { x_coordinate: x_coordinate, y_coordinate: y_coordinate, direction: direction }
   end
 
-  def _validate_param_presence
-    _place_params.values.any?(nil) ? Invalid(MISSING_PARAM_ERROR) : Valid(nil)
+  def _validate_params(params)
+    yield List::Validated[
+      _validate_param_presence(params),
+      _validate_x_coordinate_type(params),
+      _validate_y_coordinate_type(params)
+    ].traverse.to_result
+
+    Success(params)
   end
 
-  def _validate_x_coordinate_type
-    x_coordinate = _place_params[:x_coordinate]
+  def _validate_param_presence(params)
+    params.values.any?(nil) ? Invalid(MISSING_PARAM_ERROR) : Valid(nil)
+  end
+
+  def _validate_x_coordinate_type(params)
+    x_coordinate = params[:x_coordinate]
     _coordinate_type_valid?(x_coordinate) ? Valid(nil) : Invalid(_coordinate_type_error(x_coordinate))
   end
 
-  def _validate_y_coordinate_type
-    y_coordinate = _place_params[:y_coordinate]
+  def _validate_y_coordinate_type(params)
+    y_coordinate = params[:y_coordinate]
     _coordinate_type_valid?(y_coordinate) ? Valid(nil) : Invalid(_coordinate_type_error(y_coordinate))
   end
 
@@ -48,5 +62,13 @@ class RobotsController
 
   def _coordinate_type_error(coordinate)
     "#{PARTIAL_COORDINATE_TYPE_ERROR} #{coordinate}"
+  end
+
+  def _convert_to_robot_attributes
+    {
+      x_coordinate: _place_params.fetch(:x_coordinate).to_i,
+      y_coordinate: _place_params.fetch(:y_coordinate).to_i,
+      direction: _place_params.fetch(:direction)
+    }
   end
 end

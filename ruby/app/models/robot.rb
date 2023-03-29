@@ -23,6 +23,14 @@ class Robot
     Success(self)
   end
 
+  def attributes
+    {
+      x_coordinate: @x_coordinate,
+      y_coordinate: @y_coordinate,
+      direction: @direction
+    }
+  end
+
   private
 
   def _validate_direction

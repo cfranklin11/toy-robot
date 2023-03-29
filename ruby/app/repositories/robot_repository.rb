@@ -16,4 +16,10 @@ class RobotRepository
       .find_robot
       .fmap { |robot_attributes| ::Robot.new(**robot_attributes) }
   end
+
+  def place(robot)
+    robot
+      .attributes
+      .then(&@data_store.method(:insert_robot))
+  end
 end

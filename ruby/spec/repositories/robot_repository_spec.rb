@@ -50,4 +50,19 @@ describe RobotRepository do
       end
     end
   end
+
+  describe '#place' do
+    subject(:place) { repository.place(robot) }
+
+    let(:robot) do
+      RobotFactory.new
+    end
+
+    it 'places the robot' do
+      place
+      placed_robot = RobotRepository.new(EnvDataStore.new).find
+
+      expect(placed_robot.value!).to be_a(Robot)
+    end
+  end
 end

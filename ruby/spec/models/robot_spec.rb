@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'dry/monads'
 
 require 'spec_helper'
@@ -53,6 +54,16 @@ describe Robot do
       it 'contains the invalid direction error message' do
         expect(validate.failure.value).to include("#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{direction}")
       end
+    end
+  end
+
+  describe '#attributes' do
+    subject(:robot_attributes) { robot.attributes }
+
+    let(:attributes) { base_attributes }
+
+    it 'matches the attributes passed to the constructor' do
+      expect(robot_attributes).to eq(attributes)
     end
   end
 end
