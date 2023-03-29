@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 require 'dry/monads'
 
 require 'spec_helper'
@@ -29,13 +28,7 @@ describe RobotRepository do
     end
 
     context 'when robot attributes exist in the environment' do
-      let(:robot_attributes) do
-        {
-          x_coordinate: Faker::Number.number,
-          y_coordinate: Faker::Number.number,
-          direction: Faker::Compass.cardinal
-        }
-      end
+      let(:robot_attributes) { RobotFactory.valid_attributes }
 
       before do
         allow(data_store).to receive(:find_robot).and_return(Dry::Monads::Maybe::Some.new(robot_attributes))
@@ -55,7 +48,7 @@ describe RobotRepository do
     subject(:place) { repository.place(robot) }
 
     let(:robot) do
-      RobotFactory.new
+      RobotFactory.build
     end
 
     it 'places the robot' do

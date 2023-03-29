@@ -7,13 +7,7 @@ require './app/models/robot'
 
 describe Robot do
   let(:robot) { Robot.new(**attributes) }
-  let(:base_attributes) do
-    {
-      x_coordinate: Faker::Number.number,
-      y_coordinate: Faker::Number.number,
-      direction: Faker::Compass.cardinal.upcase
-    }
-  end
+  let(:base_attributes) { RobotFactory.valid_attributes }
 
   describe '#validate' do
     subject(:validate) { robot.validate }

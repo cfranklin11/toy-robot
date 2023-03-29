@@ -23,13 +23,7 @@ describe EnvDataStore do
     end
 
     context 'when robot attributes exist in the environment' do
-      let(:robot_attributes) do
-        {
-          x_coordinate: Faker::Number.number,
-          y_coordinate: Faker::Number.number,
-          direction: Faker::Compass.cardinal
-        }
-      end
+      let(:robot_attributes) { RobotFactory.valid_attributes }
 
       before do
         ENV[EnvDataStore::STATE_ENV_VAR] = robot_attributes.to_json
@@ -48,13 +42,7 @@ describe EnvDataStore do
   describe '#insert_robot' do
     subject(:insert_robot) { data_store.insert_robot(robot_attributes) }
 
-    let(:robot_attributes) do
-      {
-        x_coordinate: Faker::Number.number,
-        y_coordinate: Faker::Number.number,
-        direction: Faker::Compass.cardinal.upcase
-      }
-    end
+    let(:robot_attributes) { RobotFactory.valid_attributes }
 
     it 'is successful' do
       expect(insert_robot).to be_success
