@@ -16,17 +16,17 @@ class CLI
   end
 
   def start_game
-    _prompt_command_input
+    _prompt_command_input(COMMANDS)
   end
 
   private
 
-  def _prompt_command_input
+  def _prompt_command_input(commands)
     _prompt
-      .select(COMMAND_PROMPT, COMMANDS)
+      .select(COMMAND_PROMPT, commands)
       .then(&method(:_handle_command))
       .tap(&method(:_display_output))
-      .then(&method(:_handle_output))
+      .then { |output| _handle_output(commands, output) }
   end
 
   def _prompt
@@ -46,12 +46,15 @@ class CLI
   end
 
   def _display_output(output)
-    puts "\n#{output}\n\n"
+    puts "\n#{output.fetch(:message)}\n\n"
   end
 
-  def _handle_output(output)
-    return if output == ::RobotsController::QUIT_MESSAGE
-
-    _prompt_command_input
+  def _handle_output(prev_commands, output)
+    case output.fetch(:result)
+    when :failure
+      _prompt_command_input(prev_commands)
+    when :success
+      _prompt_command_input(COMMANDS)
+    end
   end
 end

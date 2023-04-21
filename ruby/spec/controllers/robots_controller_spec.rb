@@ -11,8 +11,12 @@ def convert_attributes_to_params(attributes)
 end
 
 shared_examples 'invalid input' do
+  it 'returns a failure result' do
+    expect(place[:result]).to eq(:failure)
+  end
+
   it 'returns a relevant error message' do
-    expect(place).to match(expected_message)
+    expect(place[:message]).to match(expected_message)
   end
 end
 
@@ -60,8 +64,12 @@ describe RobotsController do
     context 'when all params are valid' do
       let(:attributes) { base_attributes }
 
+      it 'returns a success result' do
+        expect(place[:result]).to eq(:success)
+      end
+
       it 'returns a success message' do
-        expect(place).to eq(RobotsController::PLACE_SUCCESS_MESSAGE)
+        expect(place[:message]).to eq(described_class::PLACE_SUCCESS_MESSAGE)
       end
 
       it 'places the robot' do
@@ -88,6 +96,14 @@ describe RobotsController do
 
     before do
       ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+    end
+
+    it 'returns a quit result' do
+      expect(quit[:result]).to eq(:quit)
+    end
+
+    it 'returns a message' do
+      expect(quit[:message]).to eq(described_class::QUIT_MESSAGE)
     end
 
     it 'deletes all robot state' do
