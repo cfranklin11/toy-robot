@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'dry/monads'
 
 require 'spec_helper'
@@ -11,6 +12,10 @@ describe RobotRepository do
   let(:repository) { described_class.new(data_store) }
 
   before do
+    ENV.delete(EnvDataStore::STATE_ENV_VAR)
+  end
+
+  after :all do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
   end
 
@@ -47,15 +52,29 @@ describe RobotRepository do
   describe '#place' do
     subject(:place) { repository.place(robot) }
 
-    let(:robot) do
-      RobotFactory.build
-    end
+    let(:robot) { RobotFactory.build }
 
     it 'places the robot' do
       place
       placed_robot = RobotRepository.new(EnvDataStore.new).find
 
       expect(placed_robot.value!).to be_a(Robot)
+    end
+  end
+
+  describe '#delete' do
+    subject(:delete) { repository.delete }
+
+    let(:robot) { RobotFactory.build }
+
+    before do
+      repository.place(robot)
+    end
+
+    it 'deletes the robot' do
+      expect { delete }.to(
+        change { repository.find }.from(be_a(Dry::Monads::Maybe::Some)).to(Dry::Monads::Maybe::None)
+      )
     end
   end
 end

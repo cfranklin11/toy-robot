@@ -13,6 +13,10 @@ describe EnvDataStore do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
   end
 
+  after :all do
+    ENV.delete(EnvDataStore::STATE_ENV_VAR)
+  end
+
   describe '#find_robot' do
     subject(:find_robot) { data_store.find_robot }
 
@@ -53,6 +57,29 @@ describe EnvDataStore do
       inserted_robot = data_store.find_robot
 
       expect(inserted_robot.value!).to eq(robot_attributes)
+    end
+  end
+
+  describe '#delete_robot' do
+    subject(:delete_robot) { data_store.delete_robot }
+
+    context 'when a robot exists' do
+      let(:robot_state_value) { 'robot' }
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      it 'deletes the robot data' do
+        expect { delete_robot }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(robot_state_value).to(nil)
+      end
+    end
+
+    context 'when a robot does not exist' do
+      it 'does not do anything' do
+        expect(ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil)).to be_nil
+        expect { delete_robot }.not_to(change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) })
+      end
     end
   end
 end

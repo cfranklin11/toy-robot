@@ -17,4 +17,8 @@ class EnvDataStore
     ENV[STATE_ENV_VAR] = JSON.dump(robot_attributes)
     Success(nil)
   end
+
+  def delete_robot
+    ENV.delete(STATE_ENV_VAR)
+  end
 end

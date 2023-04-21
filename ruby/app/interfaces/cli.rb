@@ -7,7 +7,6 @@ require './app/controllers/robots_controller'
 class CLI
   COMMAND_PROMPT = 'Select a command to send to the robot'
   PLACE_PROMPT = 'Where on the board do you want to place the robot? (format: X,Y,DIRECTION)'
-  QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
   PLACE_COMMAND = 'PLACE'
   QUIT_COMMAND = 'QUIT'
   COMMANDS = [PLACE_COMMAND, QUIT_COMMAND].freeze
@@ -26,6 +25,7 @@ class CLI
     _prompt
       .select(COMMAND_PROMPT, COMMANDS)
       .then(&method(:_handle_command))
+      .tap(&method(:_display_output))
       .then(&method(:_handle_output))
   end
 
@@ -36,7 +36,7 @@ class CLI
   def _handle_command(input)
     case input
     when QUIT_COMMAND
-      QUIT_MESSAGE
+      ::RobotsController.new(input).quit
     when PLACE_COMMAND
       _prompt
         .ask(PLACE_PROMPT)
@@ -45,10 +45,12 @@ class CLI
     end
   end
 
-  def _handle_output(output)
-    puts output
+  def _display_output(output)
+    puts "\n#{output}\n\n"
+  end
 
-    return if output == QUIT_MESSAGE
+  def _handle_output(output)
+    return if output == ::RobotsController::QUIT_MESSAGE
 
     _prompt_command_input
   end

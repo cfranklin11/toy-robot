@@ -22,4 +22,8 @@ class RobotRepository
       .attributes
       .then(&@data_store.method(:insert_robot))
   end
+
+  def delete
+    @data_store.delete_robot
+  end
 end

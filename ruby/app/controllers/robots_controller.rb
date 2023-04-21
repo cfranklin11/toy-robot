@@ -13,6 +13,7 @@ class RobotsController
   MISSING_PARAM_ERROR = 'Must include all 3 placement values, separated by commas (e.g. 2,3,NORTH)'
   PARTIAL_COORDINATE_TYPE_ERROR = 'All coordinates must be integers, but received'
   PLACE_SUCCESS_MESSAGE = 'Robot placed on the board!'
+  QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
 
   def initialize(params)
     @params = params
@@ -26,6 +27,13 @@ class RobotsController
       .bind(&:validate)
       .fmap(::RobotRepository.new(::EnvDataStore.new).method(:place))
       .then { |result| _convert_to_message(:place, result) }
+  end
+
+  def quit
+    ::RobotRepository
+      .new(::EnvDataStore.new)
+      .delete
+      .then { QUIT_MESSAGE }
   end
 
   private

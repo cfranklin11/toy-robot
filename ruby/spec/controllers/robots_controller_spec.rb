@@ -21,6 +21,10 @@ describe RobotsController do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
   end
 
+  after :all do
+    ENV.delete(EnvDataStore::STATE_ENV_VAR)
+  end
+
   describe '#place' do
     subject(:place) { described_class.new(params).place }
 
@@ -74,6 +78,20 @@ describe RobotsController do
       let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{invalid_direction}" }
 
       it_behaves_like 'invalid input'
+    end
+  end
+
+  describe '#quit' do
+    subject(:quit) { described_class.new('').quit }
+
+    let(:robot_state_value) { 'robot' }
+
+    before do
+      ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+    end
+
+    it 'deletes all robot state' do
+      expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(robot_state_value).to(nil)
     end
   end
 end
