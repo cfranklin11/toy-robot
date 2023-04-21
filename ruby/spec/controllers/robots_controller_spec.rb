@@ -11,12 +11,8 @@ def convert_attributes_to_params(attributes)
 end
 
 shared_examples 'invalid input' do
-  it 'is a failure' do
-    expect(place).to be_failure
-  end
-
-  it 'includes a relevant error message' do
-    expect(place.failure.value).to include(expected_message)
+  it 'returns a relevant error message' do
+    expect(place).to match(expected_message)
   end
 end
 
@@ -60,8 +56,8 @@ describe RobotsController do
     context 'when all params are valid' do
       let(:attributes) { base_attributes }
 
-      it 'is successful' do
-        expect(place).to be_success
+      it 'returns a success message' do
+        expect(place).to eq(RobotsController::PLACE_SUCCESS_MESSAGE)
       end
 
       it 'places the robot' do

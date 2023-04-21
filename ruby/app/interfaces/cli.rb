@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tty-prompt'
+require './app/controllers/robots_controller'
 
 # Available commands for the toy_robot CLI
 class CLI
@@ -17,7 +18,6 @@ class CLI
 
   def start_game
     _prompt_command_input
-      .then(&method(:puts))
   end
 
   private
@@ -26,18 +26,30 @@ class CLI
     _prompt
       .select(COMMAND_PROMPT, COMMANDS)
       .then(&method(:_handle_command))
+      .then(&method(:_handle_output))
   end
 
   def _prompt
     @prompt
   end
 
-  def _handle_command(result)
-    case result
+  def _handle_command(input)
+    case input
     when QUIT_COMMAND
       QUIT_MESSAGE
-    else
-      _prompt_command_input
+    when PLACE_COMMAND
+      _prompt
+        .ask(PLACE_PROMPT)
+        .then { |place_input| ::RobotsController.new(place_input) }
+        .place
     end
+  end
+
+  def _handle_output(output)
+    puts output
+
+    return if output == QUIT_MESSAGE
+
+    _prompt_command_input
   end
 end

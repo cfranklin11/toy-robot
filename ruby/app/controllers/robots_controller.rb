@@ -4,6 +4,7 @@ require 'dry/monads'
 
 require './app/repositories/robot_repository'
 require './app/models/robot'
+require './app/data_stores/env_data_store'
 
 # Controller for handling robot command inputs
 class RobotsController
@@ -11,6 +12,7 @@ class RobotsController
 
   MISSING_PARAM_ERROR = 'Must include all 3 placement values, separated by commas (e.g. 2,3,NORTH)'
   PARTIAL_COORDINATE_TYPE_ERROR = 'All coordinates must be integers, but received'
+  PLACE_SUCCESS_MESSAGE = 'Robot placed on the board!'
 
   def initialize(params)
     @params = params
@@ -21,8 +23,9 @@ class RobotsController
       .then(&method(:_validate_params))
       .fmap { _convert_to_robot_attributes }
       .fmap { |robot_attrs| ::Robot.new(**robot_attrs) }
-      .fmap { |robot| yield robot.validate }
+      .bind(&:validate)
       .fmap(::RobotRepository.new(::EnvDataStore.new).method(:place))
+      .then { |result| _convert_to_message(:place, result) }
   end
 
   private
@@ -70,5 +73,21 @@ class RobotsController
       y_coordinate: _place_params.fetch(:y_coordinate).to_i,
       direction: _place_params.fetch(:direction)
     }
+  end
+
+  def _convert_to_message(command, result)
+    result.either(
+      ->(_) { _success_message(command) },
+      ->(messages) { messages.value.join('\n') }
+    )
+  end
+
+  def _success_message(command)
+    case command
+    when :place
+      PLACE_SUCCESS_MESSAGE
+    else
+      ''
+    end
   end
 end
