@@ -4,9 +4,20 @@ require 'spec_helper'
 require './app/controllers/robots_controller'
 require './app/repositories/robot_repository'
 require './app/data_stores/env_data_store'
+require './app/models/robot'
 
 def convert_attributes_to_params(attributes)
   "#{attributes[:x_coordinate]},#{attributes[:y_coordinate]},#{attributes[:direction]}"
+end
+
+shared_examples 'invalid input' do
+  it 'is a failure' do
+    expect(place).to be_failure
+  end
+
+  it 'includes a relevant error message' do
+    expect(place.failure.value).to include(expected_message)
+  end
 end
 
 describe RobotsController do
@@ -25,44 +36,25 @@ describe RobotsController do
         base_attributes.delete(:direction)
         base_attributes
       end
+      let(:expected_message) { described_class::MISSING_PARAM_ERROR }
 
-      it 'is a failure' do
-        expect(place).to be_failure
-      end
-
-      it 'includes a relevant error message' do
-        expect(place.failure.value).to include(described_class::MISSING_PARAM_ERROR)
-      end
+      it_behaves_like 'invalid input'
     end
 
     context 'when the x_coordinate is not an integer' do
       let(:x_coordinate) { Faker::Number.decimal }
       let(:attributes) { base_attributes.merge(x_coordinate: x_coordinate) }
+      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{x_coordinate}" }
 
-      it 'is a failure' do
-        expect(place).to be_failure
-      end
-
-      it 'includes a relevant error message' do
-        expect(place.failure.value).to include(
-          "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{x_coordinate}"
-        )
-      end
+      it_behaves_like 'invalid input'
     end
 
     context 'when the y_coordinate is not an integer' do
       let(:y_coordinate) { Faker::Number.decimal }
       let(:attributes) { base_attributes.merge(y_coordinate: y_coordinate) }
+      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{y_coordinate}" }
 
-      it 'is a failure' do
-        expect(place).to be_failure
-      end
-
-      it 'includes a relevant error message' do
-        expect(place.failure.value).to include(
-          "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{y_coordinate}"
-        )
-      end
+      it_behaves_like 'invalid input'
     end
 
     context 'when all params are valid' do
@@ -80,16 +72,12 @@ describe RobotsController do
       end
     end
 
-    context 'when a param is invalid' do
-      let(:attributes) { base_attributes.merge(direction: Faker::Compass.cardinal.downcase) }
+    context 'when a Robot param is invalid' do
+      let(:invalid_direction) { Faker::Compass.cardinal.downcase }
+      let(:attributes) { base_attributes.merge(direction: invalid_direction) }
+      let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{invalid_direction}" }
 
-      it 'is a failure' do
-        expect(place).to be_failure
-      end
-
-      it 'returns a list of error messages' do
-        expect(place.failure.value).to match(an_array_matching([be_a(String)]))
-      end
+      it_behaves_like 'invalid input'
     end
   end
 end
