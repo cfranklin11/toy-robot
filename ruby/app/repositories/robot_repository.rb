@@ -13,17 +13,18 @@ class RobotRepository
 
   def find
     @data_store
-      .find_robot
+      .find(:robot)
       .fmap { |robot_attributes| ::Robot.new(**robot_attributes) }
   end
 
   def place(robot)
     robot
       .attributes
-      .then(&@data_store.method(:insert_robot))
+      .then { |robot_attributes| { robot: robot_attributes } }
+      .then(&@data_store.method(:insert))
   end
 
   def delete
-    @data_store.delete_robot
+    @data_store.delete(:robot)
   end
 end

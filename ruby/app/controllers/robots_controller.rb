@@ -25,15 +25,15 @@ class RobotsController
       .fmap { _convert_to_robot_attributes }
       .fmap { |robot_attrs| ::Robot.new(**robot_attrs) }
       .bind(&:validate)
-      .fmap(::RobotRepository.new(::EnvDataStore.new).method(:place))
+      .fmap(&::RobotRepository.new(::EnvDataStore.new).method(:place))
       .then { |result| _convert_to_result(:place, result) }
   end
 
   def quit
-    ::RobotRepository
-      .new(::EnvDataStore.new)
-      .delete
-      .then { _convert_to_result(:quit, Success(nil)) }
+    ::EnvDataStore
+      .new
+      .delete_all
+      .then { _convert_to_result(:quit, Success()) }
   end
 
   private

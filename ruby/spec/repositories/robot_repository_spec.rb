@@ -24,7 +24,7 @@ describe RobotRepository do
 
     context 'when robot attributes do not exist' do
       before do
-        allow(data_store).to receive(:find_robot).and_return(Dry::Monads::Maybe::None.new)
+        allow(data_store).to receive(:find).and_return(Dry::Monads::Maybe::None.new)
       end
 
       it 'is None' do
@@ -36,7 +36,7 @@ describe RobotRepository do
       let(:robot_attributes) { RobotFactory.valid_attributes }
 
       before do
-        allow(data_store).to receive(:find_robot).and_return(Dry::Monads::Maybe::Some.new(robot_attributes))
+        allow(data_store).to receive(:find).and_return(Dry::Monads::Maybe::Some.new(robot_attributes))
       end
 
       it 'is Some' do
