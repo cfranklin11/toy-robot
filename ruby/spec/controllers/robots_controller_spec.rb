@@ -32,7 +32,13 @@ describe RobotsController do
   describe '#place' do
     subject(:place) { described_class.new(params).place }
 
-    let(:base_attributes) { RobotFactory.valid_attributes }
+    let(:table) do
+      TableFactory.build(
+        max_x_coordinate: Table::DEFAULT_MAX_COORDINATE,
+        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE,
+      )
+    end
+    let(:base_attributes) { RobotFactory.valid_attributes(table) }
     let(:params) { convert_attributes_to_params(attributes) }
 
     context 'when a param is missing' do

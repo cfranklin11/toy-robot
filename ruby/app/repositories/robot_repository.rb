@@ -14,7 +14,7 @@ class RobotRepository
   def find
     @data_store
       .find(:robot)
-      .fmap { |robot_attributes| ::Robot.new(**robot_attributes) }
+      .fmap { |robot_attributes| ::Robot.new(**robot_attributes, table: Table.new) }
   end
 
   def place(robot)

@@ -22,8 +22,8 @@ class RobotsController
   def place
     _place_params
       .then(&method(:_validate_params))
-      .fmap { _convert_to_robot_attributes }
-      .fmap { |robot_attrs| ::Robot.new(**robot_attrs) }
+      .fmap(&method(:_convert_to_robot_attributes))
+      .fmap { |robot_attrs| ::Robot.new(**robot_attrs, table: ::Table.new) }
       .bind(&:validate)
       .fmap(&::RobotRepository.new(::EnvDataStore.new).method(:place))
       .then { |result| _convert_to_result(:place, result) }
@@ -75,11 +75,11 @@ class RobotsController
     "#{PARTIAL_COORDINATE_TYPE_ERROR} #{coordinate}"
   end
 
-  def _convert_to_robot_attributes
+  def _convert_to_robot_attributes(params)
     {
-      x_coordinate: _place_params.fetch(:x_coordinate).to_i,
-      y_coordinate: _place_params.fetch(:y_coordinate).to_i,
-      direction: _place_params.fetch(:direction)
+      x_coordinate: params.fetch(:x_coordinate).to_i,
+      y_coordinate: params.fetch(:y_coordinate).to_i,
+      direction: params.fetch(:direction)
     }
   end
 

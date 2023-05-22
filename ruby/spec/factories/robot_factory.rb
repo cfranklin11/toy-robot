@@ -3,18 +3,22 @@
 require 'faker'
 
 require './app/models/robot'
+require_relative './table_factory'
 
 # Factory for generating robots for specs
 class RobotFactory
-  def self.valid_attributes
+  def self.valid_attributes(table = TableFactory.build)
     {
-      x_coordinate: Faker::Number.number,
-      y_coordinate: Faker::Number.number,
+      x_coordinate: Faker::Number.between(from: 0, to: table.max_x_coordinate),
+      y_coordinate: Faker::Number.between(from: 0, to: table.max_y_coordinate),
       direction: Faker::Compass.cardinal.upcase
     }
   end
 
   def self.build(**attributes)
-    ::Robot.new(**valid_attributes.merge(attributes))
+    table = attributes[:table] || TableFactory.build
+    valid_attributes(table)
+      .merge(**attributes, table: table)
+      .then { |params| ::Robot.new(**params) }
   end
 end
