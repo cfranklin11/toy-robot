@@ -37,7 +37,7 @@ describe Robot do
     context 'when direction is not a cardinal direction' do
       let(:direction) { Faker::Compass.ordinal }
       let(:robot_params) { base_robot_params.merge(direction: direction) }
-      let(:message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{direction}" }
+      let(:message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received '#{direction}'" }
 
       it_behaves_like 'a validation'
     end
@@ -45,7 +45,7 @@ describe Robot do
     context 'when direction is not all upper case' do
       let(:direction) { Faker::Compass.cardinal.downcase }
       let(:robot_params) { base_robot_params.merge(direction: direction) }
-      let(:message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{direction}" }
+      let(:message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received '#{direction}'" }
 
       it_behaves_like 'a validation'
     end
@@ -53,7 +53,7 @@ describe Robot do
     context 'when a coordinate is off the table' do
       let(:x_coordinate) { -1 }
       let(:robot_params) { base_robot_params.merge(x_coordinate: x_coordinate) }
-      let(:message) { "The x-coordinate must be greater than or equal to 0, but received #{x_coordinate}" }
+      let(:message) { "The x-coordinate must be greater than or equal to 0, but received '#{x_coordinate}'" }
 
       it_behaves_like 'a validation'
     end

@@ -36,7 +36,7 @@ describe Table do
       let(:params) do
         { x_coordinate: x_coordinate }
       end
-      let(:message) { "The x-coordinate must be greater than or equal to 0, but received #{x_coordinate}" }
+      let(:message) { "The x-coordinate must be greater than or equal to 0, but received '#{x_coordinate}'" }
 
       it_behaves_like 'a validation'
     end
@@ -46,7 +46,7 @@ describe Table do
       let(:params) do
         { y_coordinate: y_coordinate }
       end
-      let(:message) { "The y-coordinate must be greater than or equal to 0, but received #{y_coordinate}" }
+      let(:message) { "The y-coordinate must be greater than or equal to 0, but received '#{y_coordinate}'" }
 
       it_behaves_like 'a validation'
     end
@@ -57,7 +57,7 @@ describe Table do
         { x_coordinate: x_coordinate }
       end
       let(:message) do
-        "The x-coordinate must be less than or equal to #{max_x_coordinate_param}, but received #{x_coordinate}"
+        "The x-coordinate must be less than or equal to #{max_x_coordinate_param}, but received '#{x_coordinate}'"
       end
 
       it_behaves_like 'a validation'
@@ -69,7 +69,7 @@ describe Table do
         { y_coordinate: y_coordinate }
       end
       let(:message) do
-        "The y-coordinate must be less than or equal to #{max_y_coordinate_param}, but received #{y_coordinate}"
+        "The y-coordinate must be less than or equal to #{max_y_coordinate_param}, but received '#{y_coordinate}'"
       end
 
       it_behaves_like 'a validation'

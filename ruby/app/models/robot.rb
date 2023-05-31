@@ -38,7 +38,7 @@ class Robot
   def _validate_direction
     return Valid(nil) if VALID_DIRECTIONS.include? @direction
 
-    Invalid("#{INVALID_DIRECTION_MESSAGE}, but received #{@direction}")
+    Invalid("#{INVALID_DIRECTION_MESSAGE}, but received '#{@direction}'")
   end
 
   def _validate_coordinates

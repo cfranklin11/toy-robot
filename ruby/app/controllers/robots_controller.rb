@@ -4,6 +4,7 @@ require 'dry/monads'
 
 require './app/repositories/robot_repository'
 require './app/models/robot'
+require './app/models/table'
 require './app/data_stores/env_data_store'
 
 # Controller for handling robot command inputs
@@ -72,7 +73,7 @@ class RobotsController
   end
 
   def _coordinate_type_error(coordinate)
-    "#{PARTIAL_COORDINATE_TYPE_ERROR} #{coordinate}"
+    "#{PARTIAL_COORDINATE_TYPE_ERROR} '#{coordinate}'"
   end
 
   def _convert_to_robot_attributes(params)
@@ -86,7 +87,7 @@ class RobotsController
   def _convert_to_result(command, result)
     result.either(
       ->(_) { { result: _success_result(command), message: _success_message(command) } },
-      ->(messages) { { result: :failure, message: messages.value.join('\n') } }
+      ->(messages) { { result: :failure, message: messages.value.join("\n") } }
     )
   end
 

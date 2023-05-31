@@ -54,7 +54,7 @@ describe RobotsController do
     context 'when the x_coordinate is not an integer' do
       let(:x_coordinate) { Faker::Number.decimal }
       let(:attributes) { base_attributes.merge(x_coordinate: x_coordinate) }
-      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{x_coordinate}" }
+      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} '#{x_coordinate}'" }
 
       it_behaves_like 'invalid input'
     end
@@ -62,7 +62,7 @@ describe RobotsController do
     context 'when the y_coordinate is not an integer' do
       let(:y_coordinate) { Faker::Number.decimal }
       let(:attributes) { base_attributes.merge(y_coordinate: y_coordinate) }
-      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} #{y_coordinate}" }
+      let(:expected_message) { "#{described_class::PARTIAL_COORDINATE_TYPE_ERROR} '#{y_coordinate}'" }
 
       it_behaves_like 'invalid input'
     end
@@ -89,7 +89,7 @@ describe RobotsController do
     context 'when a Robot param is invalid' do
       let(:invalid_direction) { Faker::Compass.cardinal.downcase }
       let(:attributes) { base_attributes.merge(direction: invalid_direction) }
-      let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received #{invalid_direction}" }
+      let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received '#{invalid_direction}'" }
 
       it_behaves_like 'invalid input'
     end

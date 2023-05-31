@@ -33,7 +33,7 @@ class Table
 
     if robot.x_coordinate > @max_x_coordinate
       return Invalid(
-        "The x-coordinate must be less than or equal to #{max_x_coordinate}, but received #{robot.x_coordinate}"
+        "The x-coordinate must be less than or equal to #{max_x_coordinate}, but received '#{robot.x_coordinate}'"
       )
     end
 
@@ -45,7 +45,7 @@ class Table
 
     if robot.y_coordinate > @max_y_coordinate
       return Invalid(
-        "The y-coordinate must be less than or equal to #{max_y_coordinate}, but received #{robot.y_coordinate}"
+        "The y-coordinate must be less than or equal to #{max_y_coordinate}, but received '#{robot.y_coordinate}'"
       )
     end
 
@@ -53,6 +53,6 @@ class Table
   end
 
   def _min_validation_message(coordinate_name, coordinate_value)
-    "The #{coordinate_name} must be greater than or equal to #{MIN_COORDINATE}, but received #{coordinate_value}"
+    "The #{coordinate_name} must be greater than or equal to #{MIN_COORDINATE}, but received '#{coordinate_value}'"
   end
 end
