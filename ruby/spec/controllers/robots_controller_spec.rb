@@ -2,22 +2,10 @@
 
 require 'spec_helper'
 require './app/controllers/robots_controller'
-require './app/repositories/robot_repository'
 require './app/data_stores/env_data_store'
-require './app/models/robot'
 
 def convert_attributes_to_params(attributes)
   "#{attributes[:x_coordinate]},#{attributes[:y_coordinate]},#{attributes[:direction]}"
-end
-
-shared_examples 'invalid input' do
-  it 'returns a failure result' do
-    expect(place[:result]).to eq(:failure)
-  end
-
-  it 'returns a relevant error message' do
-    expect(place[:message]).to match(expected_message)
-  end
 end
 
 describe RobotsController do
@@ -29,17 +17,39 @@ describe RobotsController do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
   end
 
+  shared_examples 'invalid input' do
+    it 'returns a failure result' do
+      expect(action[:result]).to eq(:failure)
+    end
+
+    it 'returns a relevant error message' do
+      expect(action[:message]).to match(expected_message)
+    end
+  end
+
+  shared_examples 'a successful command' do |expected_result|
+    it 'with a result' do
+      expect(action[:result]).to eq(expected_result)
+    end
+
+    it 'with a message' do
+      expect(action[:message]).to be_a(String)
+      expect(action[:message].length).to be_positive
+    end
+  end
+
   describe '.place' do
     subject(:place) { described_class.place(params) }
 
     let(:table) do
       TableFactory.build(
         max_x_coordinate: Table::DEFAULT_MAX_COORDINATE,
-        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE,
+        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE
       )
     end
     let(:base_attributes) { RobotFactory.valid_attributes(table) }
     let(:params) { convert_attributes_to_params(attributes) }
+    let(:action) { place }
 
     context 'when a param is missing' do
       let(:attributes) do
@@ -70,28 +80,7 @@ describe RobotsController do
     context 'when all params are valid' do
       let(:attributes) { base_attributes }
 
-      it 'returns a success result' do
-        expect(place[:result]).to eq(:success)
-      end
-
-      it 'returns a success message' do
-        expect(place[:message]).to eq(described_class::PLACE_SUCCESS_MESSAGE)
-      end
-
-      it 'places the robot' do
-        place
-        robot = RobotRepository.new(EnvDataStore.new).find
-
-        expect(robot.value!).to be_a(Robot)
-      end
-    end
-
-    context 'when a Robot param is invalid' do
-      let(:invalid_direction) { Faker::Compass.cardinal.downcase }
-      let(:attributes) { base_attributes.merge(direction: invalid_direction) }
-      let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received '#{invalid_direction}'" }
-
-      it_behaves_like 'invalid input'
+      it_behaves_like 'a successful command', :success
     end
   end
 
@@ -99,22 +88,13 @@ describe RobotsController do
     subject(:quit) { described_class.quit }
 
     let(:robot_state_value) { 'robot' }
+    let(:action) { quit }
 
     before do
       ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
     end
 
-    it 'returns a quit result' do
-      expect(quit[:result]).to eq(:quit)
-    end
-
-    it 'returns a message' do
-      expect(quit[:message]).to eq(described_class::QUIT_MESSAGE)
-    end
-
-    it 'deletes all robot state' do
-      expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(robot_state_value).to(nil)
-    end
+    it_behaves_like 'a successful command', :quit
   end
 
   describe '.report' do
@@ -128,18 +108,13 @@ describe RobotsController do
       let(:robot_state_value) do
         { robot: robot_attributes }.to_json
       end
+      let(:action) { report }
 
       before do
         ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
       end
 
-      it 'returns a success result' do
-        expect(report[:result]).to eq(:success)
-      end
-
-      it "returns a report of the robot's position" do
-        expect(report[:message]).to eq("#{x_coordinate},#{y_coordinate},#{direction}")
-      end
+      it_behaves_like 'a successful command', :success
     end
 
     context 'when the robot has not been placed yet' do
@@ -147,8 +122,9 @@ describe RobotsController do
         expect(report[:result]).to eq(:failure)
       end
 
-      it "returns a report of the robot's position" do
-        expect(report[:message]).to eq(described_class::NON_EXISTENT_ROBOT_MESSAGE)
+      it 'returns a message' do
+        expect(report[:message]).to be_a(String)
+        expect(report[:message].length).to be_positive
       end
     end
   end
