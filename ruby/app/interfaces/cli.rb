@@ -55,6 +55,8 @@ class CLI
       _prompt_command_input(prev_commands)
     when :success
       _prompt_command_input(COMMANDS)
+    when :quit
+      nil
     end
   end
 end

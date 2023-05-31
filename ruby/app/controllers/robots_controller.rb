@@ -27,14 +27,16 @@ class RobotsController
       .fmap { |robot_attrs| ::Robot.new(**robot_attrs, table: ::Table.new) }
       .bind(&:validate)
       .fmap(&::RobotRepository.new(::EnvDataStore.new).method(:place))
-      .then { |result| _convert_to_result(:place, result) }
+      .bind { Success(PLACE_SUCCESS_MESSAGE) }
+      .then { |result| _convert_to_output(:place, result) }
   end
 
   def quit
     ::EnvDataStore
       .new
       .delete_all
-      .then { _convert_to_result(:quit, Success()) }
+      .then { Success(QUIT_MESSAGE) }
+      .then { |result| _convert_to_output(:quit, result) }
   end
 
   private
@@ -84,22 +86,11 @@ class RobotsController
     }
   end
 
-  def _convert_to_result(command, result)
+  def _convert_to_output(command, result)
     result.either(
-      ->(_) { { result: _success_result(command), message: _success_message(command) } },
+      ->(message) { { result: _success_result(command), message: message } },
       ->(messages) { { result: :failure, message: messages.value.join("\n") } }
     )
-  end
-
-  def _success_message(command)
-    case command
-    when :place
-      PLACE_SUCCESS_MESSAGE
-    when :quit
-      QUIT_MESSAGE
-    else
-      ''
-    end
   end
 
   def _success_result(command)
