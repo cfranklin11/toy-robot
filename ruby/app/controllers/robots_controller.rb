@@ -15,6 +15,7 @@ class RobotsController
   PARTIAL_COORDINATE_TYPE_ERROR = 'All coordinates must be integers, but received'
   PLACE_SUCCESS_MESSAGE = 'Robot placed on the board!'
   QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
+  NON_EXISTENT_ROBOT_MESSAGE = 'Robot must be placed in order to report its position'
 
   def initialize(params)
     @params = params
@@ -37,6 +38,16 @@ class RobotsController
       .delete_all
       .then { Success(QUIT_MESSAGE) }
       .then { |result| _convert_to_output(:quit, result) }
+  end
+
+  def report
+    ::RobotRepository
+      .new(::EnvDataStore.new)
+      .find
+      .fmap(&:report)
+      .to_result
+      .or { Failure(List[NON_EXISTENT_ROBOT_MESSAGE]) }
+      .then { |result| _convert_to_output(:report, result) }
   end
 
   private

@@ -33,6 +33,10 @@ class Robot
     }
   end
 
+  def report
+    "#{x_coordinate},#{y_coordinate},#{@direction}"
+  end
+
   private
 
   def _validate_direction

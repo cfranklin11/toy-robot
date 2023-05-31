@@ -88,4 +88,17 @@ describe Robot do
       expect(y_coordinate).to eq(robot_params[:y_coordinate])
     end
   end
+
+  describe '#report' do
+    subject(:report) { robot.report }
+
+    let(:robot_params) { base_robot_params }
+    let(:x_coordinate) { robot_params[:x_coordinate] }
+    let(:y_coordinate) { robot_params[:y_coordinate] }
+    let(:direction) { robot_params[:direction] }
+
+    it 'returns the position of the robot' do
+      expect(report).to eq("#{x_coordinate},#{y_coordinate},#{direction}")
+    end
+  end
 end

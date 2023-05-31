@@ -116,4 +116,40 @@ describe RobotsController do
       expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(robot_state_value).to(nil)
     end
   end
+
+  describe '#report' do
+    subject(:report) { described_class.new('').report }
+
+    context 'when the robot has been placed' do
+      let(:robot_attributes) { RobotFactory.valid_attributes(TableFactory.default) }
+      let(:x_coordinate) { robot_attributes[:x_coordinate] }
+      let(:y_coordinate) { robot_attributes[:y_coordinate] }
+      let(:direction) { robot_attributes[:direction] }
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      it 'returns a success result' do
+        expect(report[:result]).to eq(:success)
+      end
+
+      it "returns a report of the robot's position" do
+        expect(report[:message]).to eq("#{x_coordinate},#{y_coordinate},#{direction}")
+      end
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'returns a failure result' do
+        expect(report[:result]).to eq(:failure)
+      end
+
+      it "returns a report of the robot's position" do
+        expect(report[:message]).to eq(described_class::NON_EXISTENT_ROBOT_MESSAGE)
+      end
+    end
+  end
 end

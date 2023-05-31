@@ -16,4 +16,8 @@ class TableFactory
   def self.build(**attributes)
     ::Table.new(**valid_attributes.merge(attributes))
   end
+
+  def self.default
+    ::Table.new
+  end
 end

@@ -9,7 +9,8 @@ class CLI
   PLACE_PROMPT = 'Where on the board do you want to place the robot? (format: X,Y,DIRECTION)'
   PLACE_COMMAND = 'PLACE'
   QUIT_COMMAND = 'QUIT'
-  COMMANDS = [PLACE_COMMAND, QUIT_COMMAND].freeze
+  REPORT_COMMAND = 'REPORT'
+  COMMANDS = [PLACE_COMMAND, REPORT_COMMAND, QUIT_COMMAND].freeze
 
   def initialize
     @prompt = TTY::Prompt.new
@@ -40,8 +41,9 @@ class CLI
     when PLACE_COMMAND
       _prompt
         .ask(PLACE_PROMPT)
-        .then { |place_input| ::RobotsController.new(place_input) }
-        .place
+        .then { |place_input| ::RobotsController.new(place_input).place }
+    when REPORT_COMMAND
+      ::RobotsController.new(input).report
     end
   end
 
