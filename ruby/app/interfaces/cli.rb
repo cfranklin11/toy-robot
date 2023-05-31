@@ -37,13 +37,13 @@ class CLI
   def _handle_command(input)
     case input
     when QUIT_COMMAND
-      ::RobotsController.new(input).quit
+      ::RobotsController.quit
     when PLACE_COMMAND
       _prompt
         .ask(PLACE_PROMPT)
-        .then { |place_input| ::RobotsController.new(place_input).place }
+        .then(&::RobotsController.method(:place))
     when REPORT_COMMAND
-      ::RobotsController.new(input).report
+      ::RobotsController.report
     end
   end
 

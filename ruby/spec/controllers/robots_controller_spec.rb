@@ -29,8 +29,8 @@ describe RobotsController do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
   end
 
-  describe '#place' do
-    subject(:place) { described_class.new(params).place }
+  describe '.place' do
+    subject(:place) { described_class.place(params) }
 
     let(:table) do
       TableFactory.build(
@@ -95,8 +95,8 @@ describe RobotsController do
     end
   end
 
-  describe '#quit' do
-    subject(:quit) { described_class.new('').quit }
+  describe '.quit' do
+    subject(:quit) { described_class.quit }
 
     let(:robot_state_value) { 'robot' }
 
@@ -117,8 +117,8 @@ describe RobotsController do
     end
   end
 
-  describe '#report' do
-    subject(:report) { described_class.new('').report }
+  describe '.report' do
+    subject(:report) { described_class.report }
 
     context 'when the robot has been placed' do
       let(:robot_attributes) { RobotFactory.valid_attributes(TableFactory.default) }
