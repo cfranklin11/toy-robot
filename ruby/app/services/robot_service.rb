@@ -12,8 +12,10 @@ class RobotService
   extend Dry::Monads[:result, :list]
 
   PLACE_SUCCESS_MESSAGE = 'Robot placed on the board!'
+  MOVE_SUCCESS_MESSAGE = 'Robot moved forward one space!'
   QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
   NON_EXISTENT_ROBOT_MESSAGE = 'Robot must be placed in order to report its position'
+  INVALID_MOVEMENT_MESSAGE = 'Robot is facing the edge of the board and cannot be moved'
 
   def self.place(params)
     table = ::Table.new
@@ -42,9 +44,22 @@ class RobotService
 
     repository
       .find
-      .fmap(&:report)
       .to_result
       .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
+      .fmap(&:report)
+  end
+
+  def self.move
+    data_store = ::EnvDataStore.new
+    repository = ::RobotRepository.new(data_store)
+
+    repository
+      .find
+      .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
+      .fmap(&:move)
+      .bind(&:validate)
+      .fmap(&repository.method(:place))
+      .bind { Success(MOVE_SUCCESS_MESSAGE) }
   end
 
   class << self

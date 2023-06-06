@@ -102,9 +102,6 @@ describe RobotsController do
 
     context 'when the robot has been placed' do
       let(:robot_attributes) { RobotFactory.valid_attributes(TableFactory.default) }
-      let(:x_coordinate) { robot_attributes[:x_coordinate] }
-      let(:y_coordinate) { robot_attributes[:y_coordinate] }
-      let(:direction) { robot_attributes[:direction] }
       let(:robot_state_value) do
         { robot: robot_attributes }.to_json
       end
@@ -125,6 +122,55 @@ describe RobotsController do
       it 'returns a message' do
         expect(report[:message]).to be_a(String)
         expect(report[:message].length).to be_positive
+      end
+    end
+  end
+
+  describe '.move' do
+    subject(:move) { described_class.move }
+
+    context 'when the robot has been placed' do
+      let(:table) { TableFactory.default }
+      let(:robot_attributes) do
+        RobotFactory.build(x_coordinate: 0, y_coordinate: 0, direction: direction).attributes
+      end
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+      let(:action) { move }
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      context 'and it is not facing the edge of the table' do
+        let(:direction) { 'NORTH' }
+
+        it_behaves_like 'a successful command', :success
+      end
+
+      context 'and it is facing the edge of the table' do
+        let(:direction) { 'SOUTH' }
+
+        it 'returns a failure result' do
+          expect(move[:result]).to eq(:failure)
+        end
+
+        it 'returns a message' do
+          expect(move[:message]).to be_a(String)
+          expect(move[:message].length).to be_positive
+        end
+      end
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'returns a failure result' do
+        expect(move[:result]).to eq(:failure)
+      end
+
+      it 'returns a message' do
+        expect(move[:message]).to be_a(String)
+        expect(move[:message].length).to be_positive
       end
     end
   end

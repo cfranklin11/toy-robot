@@ -110,8 +110,75 @@ describe RobotService do
         expect(report).to be_failure
       end
 
-      it "returns a report of the robot's position" do
+      it 'returns a message' do
         expect(report.failure.value).to include(described_class::NON_EXISTENT_ROBOT_MESSAGE)
+      end
+    end
+  end
+
+  describe '.move' do
+    subject(:move) { described_class.move }
+
+    context 'when the robot has been placed' do
+      let(:table) { TableFactory.default }
+      let(:y_coordinate) { 0 }
+      let(:x_coordinate) { 0 }
+      let(:robot_attributes) do
+        RobotFactory
+          .build(x_coordinate: x_coordinate, y_coordinate: y_coordinate, direction: direction)
+          .attributes
+      end
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+      let(:robot_repository) do
+        RobotRepository.new(EnvDataStore.new)
+      end
+      let(:moved_robot) { robot_repository.find.value! }
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      context 'and it is not facing the edge of the table' do
+        let(:direction) { 'NORTH' }
+
+        it 'is successful' do
+          expect(move).to be_success
+        end
+
+        it "saves the robot's movement" do
+          move
+          expect(moved_robot.y_coordinate).to eq(y_coordinate + 1)
+        end
+      end
+
+      context 'and it is facing the edge of the table' do
+        let(:direction) { 'SOUTH' }
+
+        it 'returns a failure result' do
+          expect(move).to be_failure
+        end
+
+        it 'returns a message' do
+          failures = move.failure.value
+          expect(failures.length).to be_positive
+          expect(failures).to all(be_a(String))
+        end
+
+        it "does not save the robot's movement" do
+          expect(moved_robot.attributes).to eq(robot_attributes)
+        end
+      end
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'is a failure' do
+        expect(move).to be_failure
+      end
+
+      it 'returns a message' do
+        expect(move.failure.value).to include(described_class::NON_EXISTENT_ROBOT_MESSAGE)
       end
     end
   end

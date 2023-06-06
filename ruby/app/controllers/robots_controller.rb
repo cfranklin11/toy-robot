@@ -30,6 +30,12 @@ class RobotsController
       .then { |result| _convert_to_output(:success, result) }
   end
 
+  def self.move
+    RobotService
+      .move
+      .then { |result| _convert_to_output(:success, result) }
+  end
+
   class << self
     def _parse_place_input(input)
       x_coordinate, y_coordinate, direction = input.split(',')

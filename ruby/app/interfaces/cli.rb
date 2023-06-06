@@ -10,7 +10,8 @@ class CLI
   PLACE_COMMAND = 'PLACE'
   QUIT_COMMAND = 'QUIT'
   REPORT_COMMAND = 'REPORT'
-  COMMANDS = [PLACE_COMMAND, REPORT_COMMAND, QUIT_COMMAND].freeze
+  MOVE_COMMAND = 'MOVE'
+  COMMANDS = [PLACE_COMMAND, REPORT_COMMAND, QUIT_COMMAND, MOVE_COMMAND].freeze
 
   def initialize
     @prompt = TTY::Prompt.new
@@ -44,6 +45,8 @@ class CLI
         .then(&::RobotsController.method(:place))
     when REPORT_COMMAND
       ::RobotsController.report
+    when MOVE_COMMAND
+      ::RobotsController.move
     end
   end
 

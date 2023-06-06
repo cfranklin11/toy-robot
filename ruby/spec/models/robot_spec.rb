@@ -89,6 +89,16 @@ describe Robot do
     end
   end
 
+  describe '#direction' do
+    subject(:direction) { robot.direction }
+
+    let(:robot_params) { base_robot_params }
+
+    it 'matches the direction attribute' do
+      expect(direction).to eq(robot_params[:direction])
+    end
+  end
+
   describe '#report' do
     subject(:report) { robot.report }
 
@@ -99,6 +109,102 @@ describe Robot do
 
     it 'returns the position of the robot' do
       expect(report).to eq("#{x_coordinate},#{y_coordinate},#{direction}")
+    end
+  end
+
+  describe '#move' do
+    subject(:move) { robot.move }
+
+    let(:robot_params) { base_robot_params.merge(direction: direction) }
+    let(:y_coordinate) { robot_params[:y_coordinate] }
+    let(:x_coordinate) { robot_params[:x_coordinate] }
+
+    context 'when the direction is NORTH' do
+      let(:direction) { 'NORTH' }
+
+      it 'returns the moved robot' do
+        expect(move).to eq(robot)
+      end
+
+      it 'moves the robot forward one space' do
+        move
+        expect(robot.y_coordinate).to eq(y_coordinate + described_class::MOVEMENT_DISTANCE)
+      end
+
+      it 'does not move the robot to the side' do
+        move
+        expect(robot.x_coordinate).to eq(x_coordinate)
+      end
+
+      it 'does not rotate the robot' do
+        expect(robot.direction).to eq(direction)
+      end
+    end
+
+    context 'when the direction is SOUTH' do
+      let(:direction) { 'SOUTH' }
+
+      it 'returns the moved robot' do
+        expect(move).to eq(robot)
+      end
+
+      it 'moves the robot forward one space' do
+        move
+        expect(robot.y_coordinate).to eq(y_coordinate - described_class::MOVEMENT_DISTANCE)
+      end
+
+      it 'does not move the robot to the side' do
+        move
+        expect(robot.x_coordinate).to eq(x_coordinate)
+      end
+
+      it 'does not rotate the robot' do
+        expect(robot.direction).to eq(direction)
+      end
+    end
+
+    context 'when the direction is EAST' do
+      let(:direction) { 'EAST' }
+
+      it 'returns the moved robot' do
+        expect(move).to eq(robot)
+      end
+
+      it 'moves the robot forward one space' do
+        move
+        expect(robot.x_coordinate).to eq(x_coordinate + described_class::MOVEMENT_DISTANCE)
+      end
+
+      it 'does not move the robot to the side' do
+        move
+        expect(robot.y_coordinate).to eq(y_coordinate)
+      end
+
+      it 'does not rotate the robot' do
+        expect(robot.direction).to eq(direction)
+      end
+    end
+
+    context 'when the direction is WEST' do
+      let(:direction) { 'WEST' }
+
+      it 'returns the moved robot' do
+        expect(move).to eq(robot)
+      end
+
+      it 'moves the robot forward one space' do
+        move
+        expect(robot.x_coordinate).to eq(x_coordinate - described_class::MOVEMENT_DISTANCE)
+      end
+
+      it 'does not move the robot to the side' do
+        move
+        expect(robot.y_coordinate).to eq(y_coordinate)
+      end
+
+      it 'does not rotate the robot' do
+        expect(robot.direction).to eq(direction)
+      end
     end
   end
 end
