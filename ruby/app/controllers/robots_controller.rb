@@ -15,7 +15,7 @@ class RobotsController
     _parse_place_input(input)
       .then(&method(:_validate_params))
       .bind(&::RobotService.method(:place))
-      .then { |result| _convert_to_output(:place, result) }
+      .then { |result| _convert_to_output(:success, result) }
   end
 
   def self.quit
@@ -27,7 +27,7 @@ class RobotsController
   def self.report
     RobotService
       .report
-      .then { |result| _convert_to_output(:report, result) }
+      .then { |result| _convert_to_output(:success, result) }
   end
 
   class << self
@@ -68,17 +68,11 @@ class RobotsController
       "#{PARTIAL_COORDINATE_TYPE_ERROR} '#{coordinate}'"
     end
 
-    def _convert_to_output(command, result)
+    def _convert_to_output(success_result, result)
       result.either(
-        ->(message) { { result: _success_result(command), message: message } },
+        ->(message) { { result: success_result, message: message } },
         ->(messages) { { result: :failure, message: messages.value.join("\n") } }
       )
-    end
-
-    def _success_result(command)
-      return :quit if command == :quit
-
-      :success
     end
   end
 end
