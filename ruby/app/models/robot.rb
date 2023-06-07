@@ -8,7 +8,13 @@ class Robot
 
   attr_reader :x_coordinate, :y_coordinate, :direction
 
-  VALID_DIRECTIONS = %w[NORTH SOUTH EAST WEST].freeze
+  LEFTWARD_ROTATIONS = {
+    'NORTH' => 'WEST',
+    'SOUTH' => 'EAST',
+    'EAST' => 'NORTH',
+    'WEST' => 'SOUTH'
+  }.freeze
+  VALID_DIRECTIONS = LEFTWARD_ROTATIONS.values.freeze
   INVALID_DIRECTION_MESSAGE = "Direction must be one of #{VALID_DIRECTIONS.join(', ')}".freeze
   MOVEMENT_DISTANCE = 1
 
@@ -40,6 +46,12 @@ class Robot
 
   def move
     _move_forward
+
+    self
+  end
+
+  def turn_left
+    @direction = LEFTWARD_ROTATIONS.fetch(@direction)
 
     self
   end

@@ -19,7 +19,7 @@ describe RobotService do
     let(:table) do
       TableFactory.build(
         max_x_coordinate: Table::DEFAULT_MAX_COORDINATE,
-        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE,
+        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE
       )
     end
     let(:base_attributes) { RobotFactory.valid_attributes(table) }
@@ -147,6 +147,10 @@ describe RobotService do
           expect(move).to be_success
         end
 
+        it 'returns a message' do
+          expect(move.value!).to eq(described_class::MOVE_SUCCESS_MESSAGE)
+        end
+
         it "saves the robot's movement" do
           move
           expect(moved_robot.y_coordinate).to eq(y_coordinate + 1)
@@ -179,6 +183,50 @@ describe RobotService do
 
       it 'returns a message' do
         expect(move.failure.value).to include(described_class::NON_EXISTENT_ROBOT_MESSAGE)
+      end
+    end
+  end
+
+  describe '.turn_left' do
+    subject(:turn_left) { described_class.turn_left }
+
+    context 'when the robot has been placed' do
+      let(:direction) { 'NORTH' }
+      let(:direction_to_left) { 'WEST' }
+      let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+      let(:robot_repository) do
+        RobotRepository.new(EnvDataStore.new)
+      end
+      let(:rotated_robot) { robot_repository.find.value! }
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      it 'is successful' do
+        expect(turn_left).to be_success
+      end
+
+      it 'returns a message' do
+        expect(turn_left.value!).to eq(described_class::TURN_LEFT_SUCCESS_MESSAGE)
+      end
+
+      it "saves the robot's rotation" do
+        turn_left
+        expect(rotated_robot.direction).to eq(direction_to_left)
+      end
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'is a failure' do
+        expect(turn_left).to be_failure
+      end
+
+      it 'returns a message' do
+        expect(turn_left.failure.value).to include(described_class::NON_EXISTENT_ROBOT_MESSAGE)
       end
     end
   end

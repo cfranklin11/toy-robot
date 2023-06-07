@@ -207,4 +207,52 @@ describe Robot do
       end
     end
   end
+
+  describe '#turn_left' do
+    subject(:turn_left) { robot.turn_left }
+
+    let(:robot_params) { base_robot_params.merge(direction: direction) }
+
+    shared_examples 'a left turn' do
+      it 'returns the rotated robot' do
+        expect(turn_left).to eq(robot)
+      end
+
+      it 'rotates the robot to the left' do
+        expect { turn_left }.to change { robot.direction }.from(direction).to(direction_to_left)
+      end
+
+      it 'does not move the robot' do
+        expect { turn_left }.not_to(change { robot.attributes.slice(:x_coordinate, :y_coordinate) })
+      end
+    end
+
+    context 'when the direction is NORTH' do
+      let(:direction) { 'NORTH' }
+      let(:direction_to_left) { 'WEST' }
+
+      it_behaves_like 'a left turn'
+    end
+
+    context 'when the direction is SOUTH' do
+      let(:direction) { 'SOUTH' }
+      let(:direction_to_left) { 'EAST' }
+
+      it_behaves_like 'a left turn'
+    end
+
+    context 'when the direction is EAST' do
+      let(:direction) { 'EAST' }
+      let(:direction_to_left) { 'NORTH' }
+
+      it_behaves_like 'a left turn'
+    end
+
+    context 'when the direction is WEST' do
+      let(:direction) { 'WEST' }
+      let(:direction_to_left) { 'SOUTH' }
+
+      it_behaves_like 'a left turn'
+    end
+  end
 end

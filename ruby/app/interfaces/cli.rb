@@ -11,7 +11,8 @@ class CLI
   QUIT_COMMAND = 'QUIT'
   REPORT_COMMAND = 'REPORT'
   MOVE_COMMAND = 'MOVE'
-  COMMANDS = [PLACE_COMMAND, REPORT_COMMAND, QUIT_COMMAND, MOVE_COMMAND].freeze
+  LEFT_COMMAND = 'LEFT'
+  COMMANDS = [PLACE_COMMAND, MOVE_COMMAND, LEFT_COMMAND, REPORT_COMMAND, QUIT_COMMAND].freeze
 
   def initialize
     @prompt = TTY::Prompt.new
@@ -35,18 +36,20 @@ class CLI
     @prompt
   end
 
-  def _handle_command(input)
+  # This method is just a case statement that delegates commands to the relevant controller actions,
+  # so I'm okay with its line length running over the limit.
+  def _handle_command(input) # rubocop:disable Metrics/MethodLength
     case input
     when QUIT_COMMAND
       ::RobotsController.quit
     when PLACE_COMMAND
-      _prompt
-        .ask(PLACE_PROMPT)
-        .then(&::RobotsController.method(:place))
+      _prompt.ask(PLACE_PROMPT).then(&::RobotsController.method(:place))
     when REPORT_COMMAND
       ::RobotsController.report
     when MOVE_COMMAND
       ::RobotsController.move
+    when LEFT_COMMAND
+      ::RobotsController.left
     end
   end
 

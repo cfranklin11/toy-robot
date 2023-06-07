@@ -174,4 +174,34 @@ describe RobotsController do
       end
     end
   end
+
+  describe '.left' do
+    subject(:left) { described_class.left }
+
+    let(:action) { left }
+
+    context 'when the robot has been placed' do
+      let(:robot_attributes) { RobotFactory.valid_attributes }
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      it_behaves_like 'a successful command', :success
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'returns a failure result' do
+        expect(left[:result]).to eq(:failure)
+      end
+
+      it 'returns a message' do
+        expect(left[:message]).to be_a(String)
+        expect(left[:message].length).to be_positive
+      end
+    end
+  end
 end

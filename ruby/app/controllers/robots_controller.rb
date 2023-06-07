@@ -36,6 +36,12 @@ class RobotsController
       .then { |result| _convert_to_output(:success, result) }
   end
 
+  def self.left
+    RobotService
+      .turn_left
+      .then { |result| _convert_to_output(:success, result) }
+  end
+
   class << self
     def _parse_place_input(input)
       x_coordinate, y_coordinate, direction = input.split(',')
