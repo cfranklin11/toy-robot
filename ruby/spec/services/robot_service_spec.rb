@@ -230,4 +230,48 @@ describe RobotService do
       end
     end
   end
+
+  describe '.turn_right' do
+    subject(:turn_right) { described_class.turn_right }
+
+    context 'when the robot has been placed' do
+      let(:direction) { 'NORTH' }
+      let(:direction_to_right) { 'EAST' }
+      let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
+      let(:robot_state_value) do
+        { robot: robot_attributes }.to_json
+      end
+      let(:robot_repository) do
+        RobotRepository.new(EnvDataStore.new)
+      end
+      let(:rotated_robot) { robot_repository.find.value! }
+
+      before do
+        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      end
+
+      it 'is successful' do
+        expect(turn_right).to be_success
+      end
+
+      it 'returns a message' do
+        expect(turn_right.value!).to eq(described_class::TURN_RIGHT_SUCCESS_MESSAGE)
+      end
+
+      it "saves the robot's rotation" do
+        turn_right
+        expect(rotated_robot.direction).to eq(direction_to_right)
+      end
+    end
+
+    context 'when the robot has not been placed yet' do
+      it 'is a failure' do
+        expect(turn_right).to be_failure
+      end
+
+      it 'returns a message' do
+        expect(turn_right.failure.value).to include(described_class::NON_EXISTENT_ROBOT_MESSAGE)
+      end
+    end
+  end
 end

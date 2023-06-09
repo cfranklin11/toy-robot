@@ -255,4 +255,52 @@ describe Robot do
       it_behaves_like 'a left turn'
     end
   end
+
+  describe '#turn_right' do
+    subject(:turn_right) { robot.turn_right }
+
+    let(:robot_params) { base_robot_params.merge(direction: direction) }
+
+    shared_examples 'a right turn' do
+      it 'returns the rotated robot' do
+        expect(turn_right).to eq(robot)
+      end
+
+      it 'rotates the robot to the right' do
+        expect { turn_right }.to change { robot.direction }.from(direction).to(direction_to_right)
+      end
+
+      it 'does not move the robot' do
+        expect { turn_right }.not_to(change { robot.attributes.slice(:x_coordinate, :y_coordinate) })
+      end
+    end
+
+    context 'when the direction is NORTH' do
+      let(:direction) { 'NORTH' }
+      let(:direction_to_right) { 'EAST' }
+
+      it_behaves_like 'a right turn'
+    end
+
+    context 'when the direction is SOUTH' do
+      let(:direction) { 'SOUTH' }
+      let(:direction_to_right) { 'WEST' }
+
+      it_behaves_like 'a right turn'
+    end
+
+    context 'when the direction is EAST' do
+      let(:direction) { 'EAST' }
+      let(:direction_to_right) { 'SOUTH' }
+
+      it_behaves_like 'a right turn'
+    end
+
+    context 'when the direction is WEST' do
+      let(:direction) { 'WEST' }
+      let(:direction_to_right) { 'NORTH' }
+
+      it_behaves_like 'a right turn'
+    end
+  end
 end

@@ -12,7 +12,8 @@ class CLI
   REPORT_COMMAND = 'REPORT'
   MOVE_COMMAND = 'MOVE'
   LEFT_COMMAND = 'LEFT'
-  COMMANDS = [PLACE_COMMAND, MOVE_COMMAND, LEFT_COMMAND, REPORT_COMMAND, QUIT_COMMAND].freeze
+  RIGHT_COMMAND = 'RIGHT'
+  COMMANDS = [PLACE_COMMAND, MOVE_COMMAND, LEFT_COMMAND, RIGHT_COMMAND, REPORT_COMMAND, QUIT_COMMAND].freeze
 
   def initialize
     @prompt = TTY::Prompt.new
@@ -50,6 +51,8 @@ class CLI
       ::RobotsController.move
     when LEFT_COMMAND
       ::RobotsController.left
+    when RIGHT_COMMAND
+      ::RobotsController.right
     end
   end
 

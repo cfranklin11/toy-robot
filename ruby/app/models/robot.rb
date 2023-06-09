@@ -14,6 +14,7 @@ class Robot
     'EAST' => 'NORTH',
     'WEST' => 'SOUTH'
   }.freeze
+  RIGHTWARD_ROTATIONS = LEFTWARD_ROTATIONS.invert.freeze
   VALID_DIRECTIONS = LEFTWARD_ROTATIONS.values.freeze
   INVALID_DIRECTION_MESSAGE = "Direction must be one of #{VALID_DIRECTIONS.join(', ')}".freeze
   MOVEMENT_DISTANCE = 1
@@ -52,6 +53,12 @@ class Robot
 
   def turn_left
     @direction = LEFTWARD_ROTATIONS.fetch(@direction)
+
+    self
+  end
+
+  def turn_right
+    @direction = RIGHTWARD_ROTATIONS.fetch(@direction)
 
     self
   end

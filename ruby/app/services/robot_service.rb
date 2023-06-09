@@ -14,6 +14,7 @@ class RobotService
   PLACE_SUCCESS_MESSAGE = 'Robot placed on the board!'
   MOVE_SUCCESS_MESSAGE = 'Robot moved forward one space!'
   TURN_LEFT_SUCCESS_MESSAGE = 'Robot rotated left!'
+  TURN_RIGHT_SUCCESS_MESSAGE = 'Robot rotated right!'
   QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
   NON_EXISTENT_ROBOT_MESSAGE = 'Robot must be placed in order to report its position'
   INVALID_MOVEMENT_MESSAGE = 'Robot is facing the edge of the board and cannot be moved'
@@ -74,6 +75,19 @@ class RobotService
       .bind(&:validate)
       .fmap(&repository.method(:place))
       .bind { Success(TURN_LEFT_SUCCESS_MESSAGE) }
+  end
+
+  def self.turn_right
+    data_store = ::EnvDataStore.new
+    repository = ::RobotRepository.new(data_store)
+
+    repository
+      .find
+      .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
+      .fmap(&:turn_right)
+      .bind(&:validate)
+      .fmap(&repository.method(:place))
+      .bind { Success(TURN_RIGHT_SUCCESS_MESSAGE) }
   end
 
   class << self
