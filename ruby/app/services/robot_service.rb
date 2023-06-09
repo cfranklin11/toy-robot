@@ -17,17 +17,20 @@ class RobotService
   TURN_RIGHT_SUCCESS_MESSAGE = 'Robot rotated right!'
   QUIT_MESSAGE = 'Thanks for playing Toy Robot!'
   NON_EXISTENT_ROBOT_MESSAGE = 'Robot must be placed in order to report its position'
+  NON_EXISTENT_TABLE_MESSAGE = 'Could not find a table'
   INVALID_MOVEMENT_MESSAGE = 'Robot is facing the edge of the board and cannot be moved'
 
   def self.place(params)
-    table = ::Table.new
     data_store = ::EnvDataStore.new
     repository = ::RobotRepository.new(data_store)
 
-    _convert_to_robot_attributes(params)
-      .then { |attributes| attributes.merge(table: table) }
-      .then(&method(:_build_robot))
-      .then(&:validate)
+    ::TableRepository
+      .new(data_store)
+      .find
+      .or { Failure(Dry::Monads::List[NON_EXISTENT_TABLE_MESSAGE]) }
+      .fmap { |table| _convert_to_robot_attributes(params, table) }
+      .fmap(&method(:_build_robot))
+      .bind(&:validate)
       .fmap(&repository.method(:save))
       .bind { Success(PLACE_SUCCESS_MESSAGE) }
   end
@@ -91,11 +94,14 @@ class RobotService
   end
 
   class << self
-    def _convert_to_robot_attributes(params)
+    private
+
+    def _convert_to_robot_attributes(params, table)
       {
         x_coordinate: params.fetch(:x_coordinate).to_i,
         y_coordinate: params.fetch(:y_coordinate).to_i,
-        direction: params.fetch(:direction)
+        direction: params.fetch(:direction),
+        table: table
       }
     end
 

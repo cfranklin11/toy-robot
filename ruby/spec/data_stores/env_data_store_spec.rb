@@ -82,6 +82,10 @@ describe EnvDataStore do
         expect(insert).to be_success
       end
 
+      it 'that is empty' do
+        expect(insert.value!).to eq(Dry::Monads::Unit)
+      end
+
       it 'that inserts the data' do
         insert
         inserted_data = data_store.find(data_key)

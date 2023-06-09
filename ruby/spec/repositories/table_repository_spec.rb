@@ -3,11 +3,11 @@
 require 'dry/monads'
 
 require 'spec_helper'
-require './app/repositories/robot_repository'
+require './app/repositories/table_repository'
 require './app/data_stores/env_data_store'
-require './app/models/robot'
+require './app/models/table'
 
-describe RobotRepository do
+describe TableRepository do
   let(:data_store) { EnvDataStore.new }
   let(:repository) { described_class.new(data_store) }
 
@@ -22,50 +22,56 @@ describe RobotRepository do
   describe '#find' do
     subject(:find) { repository.find }
 
-    let(:table) { TableFactory.create }
+    context 'when table attributes do not exist' do
+      before do
+        allow(data_store).to receive(:find).and_return(Dry::Monads::Maybe::None.new)
+      end
 
-    context 'when robot attributes do not exist' do
       it 'is None' do
         expect(find).to be_a(Dry::Monads::Maybe::None)
       end
     end
 
-    context 'when robot attributes exist in the environment' do
+    context 'when table attributes exist in the environment' do
+      let(:table_attributes) { TableFactory.valid_attributes }
+
       before do
-        RobotFactory.create(table: table)
+        allow(data_store).to receive(:find).and_return(Dry::Monads::Maybe::Some.new(table_attributes))
       end
 
       it 'is Some' do
         expect(find).to be_a(Dry::Monads::Maybe::Some)
       end
 
-      it 'contains a robot' do
-        expect(find.value!).to be_a(Robot)
+      it 'contains a table' do
+        expect(find.value!).to be_a(Table)
       end
     end
   end
 
   describe '#save' do
-    subject(:save) { repository.save(robot) }
+    subject(:save) { repository.save(table) }
 
-    let(:table) { TableFactory.create }
-    let(:robot) { RobotFactory.build(table: table) }
+    let(:table) { TableFactory.build }
 
-    it 'saves the robot' do
-      expect { save }.to(
-        change { repository.find }.from(Dry::Monads::Maybe::None).to(be_a(Dry::Monads::Maybe::Some))
-      )
+    it 'saves the table' do
+      save
+      saved_table = TableRepository.new(EnvDataStore.new).find
+
+      expect(saved_table.value!).to be_a(Table)
     end
   end
 
   describe '#delete' do
     subject(:delete) { repository.delete }
 
+    let(:table) { TableFactory.build }
+
     before do
-      RobotFactory.create
+      repository.save(table)
     end
 
-    it 'deletes the robot' do
+    it 'deletes the table' do
       expect { delete }.to(
         change { repository.find }.from(be_a(Dry::Monads::Maybe::Some)).to(Dry::Monads::Maybe::None)
       )

@@ -14,7 +14,7 @@ class EnvDataStore
     _fetch_data
       .or { Maybe({}) }
       .fmap { |existing_data| existing_data.merge(**data) }
-      .fmap(&method(:_save_state))
+      .bind(&method(:_save_state))
   end
 
   def delete(data_key)

@@ -73,7 +73,7 @@ class Robot
 
   def _validate_coordinates
     @table
-      .validate(self)
+      .validate_robot(self)
       .bind { Valid(nil) }
       .or { |errors| errors.map { |error| Invalid(error) } }
   end

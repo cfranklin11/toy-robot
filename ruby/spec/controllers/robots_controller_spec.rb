@@ -42,9 +42,9 @@ describe RobotsController do
     subject(:place) { described_class.place(params) }
 
     let(:table) do
-      TableFactory.build(
-        max_x_coordinate: Table::DEFAULT_MAX_COORDINATE,
-        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE
+      TableFactory.create(
+        max_x_coordinate: TableFactory::DEFAULT_MAX_COORDINATE,
+        max_y_coordinate: TableFactory::DEFAULT_MAX_COORDINATE
       )
     end
     let(:base_attributes) { RobotFactory.valid_attributes(table) }
@@ -87,28 +87,29 @@ describe RobotsController do
   describe '.quit' do
     subject(:quit) { described_class.quit }
 
-    let(:robot_state_value) { 'robot' }
     let(:action) { quit }
 
     before do
-      ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      RobotFactory.create
     end
 
     it_behaves_like 'a successful command', :quit
+
+    it 'deletes the game state' do
+      expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(be_a(String)).to(nil)
+    end
   end
 
   describe '.report' do
     subject(:report) { described_class.report }
 
+    let(:table) { TableFactory.create }
+
     context 'when the robot has been placed' do
-      let(:robot_attributes) { RobotFactory.valid_attributes(TableFactory.default) }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
-      end
       let(:action) { report }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        RobotFactory.create(table: table)
       end
 
       it_behaves_like 'a successful command', :success
@@ -129,18 +130,13 @@ describe RobotsController do
   describe '.move' do
     subject(:move) { described_class.move }
 
+    let(:table) { TableFactory.create }
+
     context 'when the robot has been placed' do
-      let(:table) { TableFactory.default }
-      let(:robot_attributes) do
-        RobotFactory.build(x_coordinate: 0, y_coordinate: 0, direction: direction).attributes
-      end
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
-      end
       let(:action) { move }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        RobotFactory.create(table: table, direction: direction, y_coordinate: 0)
       end
 
       context 'and it is not facing the edge of the table' do
@@ -178,16 +174,12 @@ describe RobotsController do
   describe '.left' do
     subject(:left) { described_class.left }
 
+    let(:table) { TableFactory.create }
     let(:action) { left }
 
     context 'when the robot has been placed' do
-      let(:robot_attributes) { RobotFactory.valid_attributes }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
-      end
-
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        RobotFactory.create(table: table)
       end
 
       it_behaves_like 'a successful command', :success
@@ -208,16 +200,12 @@ describe RobotsController do
   describe '.right' do
     subject(:right) { described_class.right }
 
+    let(:table) { TableFactory.create }
     let(:action) { right }
 
     context 'when the robot has been placed' do
-      let(:robot_attributes) { RobotFactory.valid_attributes }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
-      end
-
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        RobotFactory.create(table: table)
       end
 
       it_behaves_like 'a successful command', :success

@@ -5,8 +5,11 @@ require 'spec_helper'
 require './app/services/robot_service'
 
 describe RobotService do
+  let(:table) { TableFactory.default }
+
   before do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
+    TableRepository.new(EnvDataStore.new).save(table)
   end
 
   after :all do
@@ -16,12 +19,6 @@ describe RobotService do
   describe '.place' do
     subject(:place) { described_class.place(params) }
 
-    let(:table) do
-      TableFactory.build(
-        max_x_coordinate: Table::DEFAULT_MAX_COORDINATE,
-        max_y_coordinate: Table::DEFAULT_MAX_COORDINATE
-      )
-    end
     let(:base_attributes) { RobotFactory.valid_attributes(table) }
 
     context 'when all params are valid' do
@@ -61,10 +58,10 @@ describe RobotService do
   describe '.quit' do
     subject(:quit) { described_class.quit }
 
-    let(:robot_state_value) { 'robot' }
+    let(:game_state_value) { 'robot' }
 
     before do
-      ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+      ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
     end
 
     it 'is successful' do
@@ -76,7 +73,7 @@ describe RobotService do
     end
 
     it 'deletes all robot state' do
-      expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(robot_state_value).to(nil)
+      expect { quit }.to change { ENV.fetch(EnvDataStore::STATE_ENV_VAR, nil) }.from(game_state_value).to(nil)
     end
   end
 
@@ -88,12 +85,12 @@ describe RobotService do
       let(:x_coordinate) { robot_attributes[:x_coordinate] }
       let(:y_coordinate) { robot_attributes[:y_coordinate] }
       let(:direction) { robot_attributes[:direction] }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
+      let(:game_state_value) do
+        { robot: robot_attributes, table: table.attributes }.to_json
       end
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
       end
 
       it 'is successful' do
@@ -120,7 +117,6 @@ describe RobotService do
     subject(:move) { described_class.move }
 
     context 'when the robot has been placed' do
-      let(:table) { TableFactory.default }
       let(:y_coordinate) { 0 }
       let(:x_coordinate) { 0 }
       let(:robot_attributes) do
@@ -128,8 +124,8 @@ describe RobotService do
           .build(x_coordinate: x_coordinate, y_coordinate: y_coordinate, direction: direction)
           .attributes
       end
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
+      let(:game_state_value) do
+        { robot: robot_attributes, table: table.attributes }.to_json
       end
       let(:robot_repository) do
         RobotRepository.new(EnvDataStore.new)
@@ -137,7 +133,7 @@ describe RobotService do
       let(:moved_robot) { robot_repository.find.value! }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
       end
 
       context 'and it is not facing the edge of the table' do
@@ -194,8 +190,8 @@ describe RobotService do
       let(:direction) { 'NORTH' }
       let(:direction_to_left) { 'WEST' }
       let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
+      let(:game_state_value) do
+        { robot: robot_attributes, table: table.attributes }.to_json
       end
       let(:robot_repository) do
         RobotRepository.new(EnvDataStore.new)
@@ -203,7 +199,7 @@ describe RobotService do
       let(:rotated_robot) { robot_repository.find.value! }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
       end
 
       it 'is successful' do
@@ -238,8 +234,8 @@ describe RobotService do
       let(:direction) { 'NORTH' }
       let(:direction_to_right) { 'EAST' }
       let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
-      let(:robot_state_value) do
-        { robot: robot_attributes }.to_json
+      let(:game_state_value) do
+        { robot: robot_attributes, table: table.attributes }.to_json
       end
       let(:robot_repository) do
         RobotRepository.new(EnvDataStore.new)
@@ -247,7 +243,7 @@ describe RobotService do
       let(:rotated_robot) { robot_repository.find.value! }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = robot_state_value
+        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
       end
 
       it 'is successful' do

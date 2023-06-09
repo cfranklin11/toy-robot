@@ -6,7 +6,7 @@ require './app/models/table'
 
 describe Robot do
   let(:robot) { described_class.new(**robot_params) }
-  let(:table) { Table.new }
+  let(:table) { TableFactory.build }
   let(:base_robot_params) { RobotFactory.valid_attributes(table).merge(table: table) }
 
   describe '#validate' do

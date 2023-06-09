@@ -2,6 +2,7 @@
 
 require 'tty-prompt'
 require './app/controllers/robots_controller'
+require './app/controllers/tables_controller'
 
 # Available commands for the toy_robot CLI
 class CLI
@@ -20,10 +21,15 @@ class CLI
   end
 
   def start_game
+    _setup_game
     _prompt_command_input(COMMANDS)
   end
 
   private
+
+  def _setup_game
+    ::TablesController.create
+  end
 
   def _prompt_command_input(commands)
     _prompt

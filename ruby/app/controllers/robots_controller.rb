@@ -49,6 +49,8 @@ class RobotsController
   end
 
   class << self
+    private
+
     def _parse_place_input(input)
       x_coordinate, y_coordinate, direction = input.split(',')
       { x_coordinate: x_coordinate, y_coordinate: y_coordinate, direction: direction }
