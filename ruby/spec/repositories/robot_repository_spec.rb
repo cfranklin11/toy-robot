@@ -49,16 +49,16 @@ describe RobotRepository do
     end
   end
 
-  describe '#place' do
-    subject(:place) { repository.place(robot) }
+  describe '#save' do
+    subject(:save) { repository.save(robot) }
 
     let(:robot) { RobotFactory.build }
 
-    it 'places the robot' do
-      place
-      placed_robot = RobotRepository.new(EnvDataStore.new).find
+    it 'saves the robot' do
+      save
+      saved_robot = RobotRepository.new(EnvDataStore.new).find
 
-      expect(placed_robot.value!).to be_a(Robot)
+      expect(saved_robot.value!).to be_a(Robot)
     end
   end
 
@@ -68,7 +68,7 @@ describe RobotRepository do
     let(:robot) { RobotFactory.build }
 
     before do
-      repository.place(robot)
+      repository.save(robot)
     end
 
     it 'deletes the robot' do

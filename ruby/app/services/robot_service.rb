@@ -28,7 +28,7 @@ class RobotService
       .then { |attributes| attributes.merge(table: table) }
       .then(&method(:_build_robot))
       .then(&:validate)
-      .fmap(&repository.method(:place))
+      .fmap(&repository.method(:save))
       .bind { Success(PLACE_SUCCESS_MESSAGE) }
   end
 
@@ -60,7 +60,7 @@ class RobotService
       .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
       .fmap(&:move)
       .bind(&:validate)
-      .fmap(&repository.method(:place))
+      .fmap(&repository.method(:save))
       .bind { Success(MOVE_SUCCESS_MESSAGE) }
   end
 
@@ -73,7 +73,7 @@ class RobotService
       .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
       .fmap(&:turn_left)
       .bind(&:validate)
-      .fmap(&repository.method(:place))
+      .fmap(&repository.method(:save))
       .bind { Success(TURN_LEFT_SUCCESS_MESSAGE) }
   end
 
@@ -86,7 +86,7 @@ class RobotService
       .or { Failure(Dry::Monads::List[NON_EXISTENT_ROBOT_MESSAGE]) }
       .fmap(&:turn_right)
       .bind(&:validate)
-      .fmap(&repository.method(:place))
+      .fmap(&repository.method(:save))
       .bind { Success(TURN_RIGHT_SUCCESS_MESSAGE) }
   end
 

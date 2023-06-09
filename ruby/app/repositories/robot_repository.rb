@@ -17,7 +17,7 @@ class RobotRepository
       .fmap { |robot_attributes| ::Robot.new(**robot_attributes, table: Table.new) }
   end
 
-  def place(robot)
+  def save(robot)
     robot
       .attributes
       .then { |robot_attributes| { robot: robot_attributes } }
