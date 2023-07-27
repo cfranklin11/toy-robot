@@ -5,11 +5,8 @@ require 'spec_helper'
 require './app/services/robot_service'
 
 describe RobotService do
-  let(:table) { TableFactory.default }
-
   before do
     ENV.delete(EnvDataStore::STATE_ENV_VAR)
-    TableRepository.new(EnvDataStore.new).save(table)
   end
 
   after :all do
@@ -24,19 +21,36 @@ describe RobotService do
     context 'when all params are valid' do
       let(:params) { base_attributes }
 
-      it 'returns a success result' do
-        expect(place).to be_success
+      context 'when a table already exists' do
+        let(:table) { TableFactory.create }
+        let(:repository) { RobotRepository.new(EnvDataStore.new) }
+
+        it 'returns a success result' do
+          expect(place).to be_success
+        end
+
+        it 'returns a success message' do
+          expect(place.value!).to eq(described_class::PLACE_SUCCESS_MESSAGE)
+        end
+
+        it 'places the robot' do
+          expect { place }.to(
+            change { repository.find }.from(Dry::Monads::None).to(be_a(Dry::Monads::Some))
+          )
+        end
       end
 
-      it 'returns a success message' do
-        expect(place.value!).to eq(described_class::PLACE_SUCCESS_MESSAGE)
-      end
+      context 'when a table does not exist yet' do
+        let(:table) { TableFactory.build }
+        let(:expected_message) { described_class::NON_EXISTENT_TABLE_MESSAGE }
 
-      it 'places the robot' do
-        place
-        robot = RobotRepository.new(EnvDataStore.new).find
+        it 'is a failure' do
+          expect(place).to be_failure
+        end
 
-        expect(robot.value!).to be_a(Robot)
+        it 'returns a relevant error message' do
+          expect(place.failure.value).to include(expected_message)
+        end
       end
     end
 
@@ -44,6 +58,8 @@ describe RobotService do
       let(:invalid_direction) { Faker::Compass.cardinal.downcase }
       let(:params) { base_attributes.merge(direction: invalid_direction) }
       let(:expected_message) { "#{Robot::INVALID_DIRECTION_MESSAGE}, but received '#{invalid_direction}'" }
+
+      let!(:table) { TableFactory.create }
 
       it 'is a failure' do
         expect(place).to be_failure
@@ -81,17 +97,10 @@ describe RobotService do
     subject(:report) { described_class.report }
 
     context 'when the robot has been placed' do
-      let(:robot_attributes) { RobotFactory.valid_attributes(TableFactory.default) }
-      let(:x_coordinate) { robot_attributes[:x_coordinate] }
-      let(:y_coordinate) { robot_attributes[:y_coordinate] }
-      let(:direction) { robot_attributes[:direction] }
-      let(:game_state_value) do
-        { robot: robot_attributes, table: table.attributes }.to_json
-      end
-
-      before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
-      end
+      let!(:robot) { RobotFactory.create }
+      let(:x_coordinate) { robot.x_coordinate }
+      let(:y_coordinate) { robot.y_coordinate }
+      let(:direction) { robot.direction }
 
       it 'is successful' do
         expect(report).to be_success
@@ -119,22 +128,21 @@ describe RobotService do
     context 'when the robot has been placed' do
       let(:y_coordinate) { 0 }
       let(:x_coordinate) { 0 }
-      let(:robot_attributes) do
-        RobotFactory
-          .build(x_coordinate: x_coordinate, y_coordinate: y_coordinate, direction: direction)
-          .attributes
-      end
-      let(:game_state_value) do
-        { robot: robot_attributes, table: table.attributes }.to_json
-      end
       let(:robot_repository) do
         RobotRepository.new(EnvDataStore.new)
       end
       let(:moved_robot) { robot_repository.find.value! }
+      let(:table) { TableFactory.create(**TableFactory.default.attributes) }
 
-      before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
+      let!(:robot) do
+        RobotFactory.create(
+          x_coordinate: x_coordinate,
+          y_coordinate: y_coordinate,
+          direction: direction,
+          table: table
+        )
       end
+      let(:robot_attributes) { robot.attributes }
 
       context 'and it is not facing the edge of the table' do
         let(:direction) { 'NORTH' }
@@ -149,7 +157,7 @@ describe RobotService do
 
         it "saves the robot's movement" do
           move
-          expect(moved_robot.y_coordinate).to eq(y_coordinate + 1)
+          expect(moved_robot.fetch(:y_coordinate)).to eq(y_coordinate + 1)
         end
       end
 
@@ -167,7 +175,7 @@ describe RobotService do
         end
 
         it "does not save the robot's movement" do
-          expect(moved_robot.attributes).to eq(robot_attributes)
+          expect(moved_robot).to eq(robot_attributes)
         end
       end
     end
@@ -189,17 +197,11 @@ describe RobotService do
     context 'when the robot has been placed' do
       let(:direction) { 'NORTH' }
       let(:direction_to_left) { 'WEST' }
-      let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
-      let(:game_state_value) do
-        { robot: robot_attributes, table: table.attributes }.to_json
-      end
-      let(:robot_repository) do
-        RobotRepository.new(EnvDataStore.new)
-      end
+      let(:robot_repository) { RobotRepository.new(EnvDataStore.new) }
       let(:rotated_robot) { robot_repository.find.value! }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
+        RobotFactory.create(direction: direction)
       end
 
       it 'is successful' do
@@ -212,7 +214,7 @@ describe RobotService do
 
       it "saves the robot's rotation" do
         turn_left
-        expect(rotated_robot.direction).to eq(direction_to_left)
+        expect(rotated_robot.fetch(:direction)).to eq(direction_to_left)
       end
     end
 
@@ -233,17 +235,11 @@ describe RobotService do
     context 'when the robot has been placed' do
       let(:direction) { 'NORTH' }
       let(:direction_to_right) { 'EAST' }
-      let(:robot_attributes) { RobotFactory.valid_attributes.merge(direction: direction) }
-      let(:game_state_value) do
-        { robot: robot_attributes, table: table.attributes }.to_json
-      end
-      let(:robot_repository) do
-        RobotRepository.new(EnvDataStore.new)
-      end
+      let(:robot_repository) { RobotRepository.new(EnvDataStore.new) }
       let(:rotated_robot) { robot_repository.find.value! }
 
       before do
-        ENV[EnvDataStore::STATE_ENV_VAR] = game_state_value
+        RobotFactory.create(direction: direction)
       end
 
       it 'is successful' do
@@ -256,7 +252,7 @@ describe RobotService do
 
       it "saves the robot's rotation" do
         turn_right
-        expect(rotated_robot.direction).to eq(direction_to_right)
+        expect(rotated_robot.fetch(:direction)).to eq(direction_to_right)
       end
     end
 

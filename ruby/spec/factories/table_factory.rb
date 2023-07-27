@@ -8,8 +8,6 @@ require './app/data_stores/env_data_store'
 
 # Factory for generating tables for specs
 class TableFactory
-  DEFAULT_MAX_COORDINATE = 5
-
   def self.valid_attributes
     {
       max_x_coordinate: Faker::Number.between(from: 0, to: 100),
@@ -30,6 +28,6 @@ class TableFactory
   end
 
   def self.default
-    ::Table.new(max_x_coordinate: DEFAULT_MAX_COORDINATE, max_y_coordinate: DEFAULT_MAX_COORDINATE)
+    ::Table.new
   end
 end

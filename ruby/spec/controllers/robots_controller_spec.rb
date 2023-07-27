@@ -41,12 +41,7 @@ describe RobotsController do
   describe '.place' do
     subject(:place) { described_class.place(params) }
 
-    let(:table) do
-      TableFactory.create(
-        max_x_coordinate: TableFactory::DEFAULT_MAX_COORDINATE,
-        max_y_coordinate: TableFactory::DEFAULT_MAX_COORDINATE
-      )
-    end
+    let(:table) { TableFactory.create(**TableFactory.default.attributes) }
     let(:base_attributes) { RobotFactory.valid_attributes(table) }
     let(:params) { convert_attributes_to_params(attributes) }
     let(:action) { place }

@@ -8,19 +8,25 @@ require './app/data_stores/env_data_store'
 class TablesController
   extend Dry::Monads[:result]
 
-  def self.create(max_x_coordinate: Table::DEFAULT_MAX_COORDINATE, max_y_coordinate: Table::DEFAULT_MAX_COORDINATE)
-    Table
-      .new(max_x_coordinate: max_x_coordinate, max_y_coordinate: max_y_coordinate)
+  def self.create(max_x_coordinate: nil, max_y_coordinate: nil)
+    data_store = EnvDataStore.new
+    repository = TableRepository.new(data_store)
+
+    { max_x_coordinate: max_x_coordinate, max_y_coordinate: max_y_coordinate }
+      .compact
+      .then { |attributes| Table.new(**attributes) }
       .validate
-      .bind(&TableRepository.new(EnvDataStore.new).method(:save))
+      .bind(repository.method(:save))
       .to_result
       .bind { Success('Table created') }
       .then(&method(:_convert_to_output))
   end
 
   def self.quit
-    TableRepository
-      .new(EnvDataStore.new)
+    data_store = EnvDataStore.new
+    repository = TableRepository.new(data_store)
+
+    repository
       .delete
       .to_result
       .bind { Success('Table removed') }

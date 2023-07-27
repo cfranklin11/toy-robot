@@ -22,8 +22,6 @@ describe RobotRepository do
   describe '#find' do
     subject(:find) { repository.find }
 
-    let(:table) { TableFactory.create }
-
     context 'when robot attributes do not exist' do
       it 'is None' do
         expect(find).to be_a(Dry::Monads::Maybe::None)
@@ -31,16 +29,14 @@ describe RobotRepository do
     end
 
     context 'when robot attributes exist in the environment' do
-      before do
-        RobotFactory.create(table: table)
-      end
+      let!(:robot_attributes) { RobotFactory.create.attributes }
 
       it 'is Some' do
         expect(find).to be_a(Dry::Monads::Maybe::Some)
       end
 
-      it 'contains a robot' do
-        expect(find.value!).to be_a(Robot)
+      it 'contains robot attributes' do
+        expect(find.value!).to eq(robot_attributes)
       end
     end
   end
@@ -48,8 +44,7 @@ describe RobotRepository do
   describe '#save' do
     subject(:save) { repository.save(robot) }
 
-    let(:table) { TableFactory.create }
-    let(:robot) { RobotFactory.build(table: table) }
+    let(:robot) { RobotFactory.build }
 
     it 'saves the robot' do
       expect { save }.to(

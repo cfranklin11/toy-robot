@@ -26,10 +26,9 @@ class RobotFactory
 
   def self.create(**attributes)
     table = attributes.fetch(:table, nil) || TableFactory.create
-    ::RobotRepository
-      .new(EnvDataStore.new)
-      .tap { |repo| repo.save(build(**attributes, table: table)) }
-      .find
-      .value!
+    attributes
+      .merge(table: table)
+      .then { |robot_attributes| build(**robot_attributes) }
+      .tap(&::RobotRepository.new(EnvDataStore.new).method(:save))
   end
 end
