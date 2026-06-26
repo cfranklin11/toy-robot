@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cfranklin11/toy-robot/golang/internal/table"
+	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
 const tableWidth int = 5
