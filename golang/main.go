@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cfranklin11/toy-robot/internal/table"
+	"github.com/cfranklin11/toy-robot/internal/game"
 )
 
 const tableWidth int = 5
@@ -18,7 +18,7 @@ func requestCommand() {
 
 func main() {
 	fmt.Println("Welcome to Toy Robot!")
-	_, err := table.BuildTable(tableWidth, tableHeight)
+	_, err := game.BuildGame(tableWidth, tableHeight)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\nExiting game.", err)
 		return
