@@ -6,17 +6,24 @@ import (
 	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
+const tableWidth int = 5
+const tableHeight int = 5
+
 type Game struct {
 	Table table.Table
 	Robot robot.Robot
 }
 
-func (g Game) ExecuteCommand(command command.Command) command.Command {
-	return command
+func (g Game) ExecuteCommand(command command.Command) error {
+	return nil
 }
 
-func BuildGame(width, height int) (*Game, error) {
-	table, err := table.BuildTable(width, height)
+func BuildGame(table table.Table, robot robot.Robot) (*Game, error) {
+	return &Game{Table: table, Robot: robot}, nil
+}
+
+func StartGame() (*Game, error) {
+	table, err := table.BuildTable(tableWidth, tableHeight)
 	if err != nil {
 		return nil, err
 	}
@@ -26,5 +33,14 @@ func BuildGame(width, height int) (*Game, error) {
 		return nil, err
 	}
 
-	return &Game{Table: *table, Robot: *robot}, nil
+	return BuildGame(*table, *robot)
+}
+
+func HandleCommand(game Game, input string) error {
+	command, err := command.BuildCommand(input)
+	if err != nil {
+		return err
+	}
+
+	return game.ExecuteCommand(*command)
 }
