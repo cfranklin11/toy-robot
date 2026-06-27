@@ -2,6 +2,8 @@ package game
 
 import (
 	"testing"
+
+	"github.com/cfranklin11/toy-robot/internal/command"
 )
 
 func TestBuildGame_validDimensions(t *testing.T) {
@@ -13,4 +15,10 @@ func TestBuildGame_validDimensions(t *testing.T) {
 	if game == nil {
 		t.Fatalf("expected Game to be present, got %v", game)
 	}
+}
+
+func TestExecuteCommand(t *testing.T) {
+	game, _ := BuildGame(5, 5)
+	command, _ := command.BuildCommand("MOVE")
+	game.ExecuteCommand(*command)
 }

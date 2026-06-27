@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cfranklin11/toy-robot/internal/command"
 	"github.com/cfranklin11/toy-robot/internal/game"
 )
 
@@ -18,17 +19,23 @@ func requestCommand() {
 
 func main() {
 	fmt.Println("Welcome to Toy Robot!")
-	_, err := game.BuildGame(tableWidth, tableHeight)
+	game, err := game.BuildGame(tableWidth, tableHeight)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\nExiting game.", err)
+		fmt.Fprintf(os.Stderr, "Error: %s\nExiting game.\n", err)
 		return
 	}
 
 	requestCommand()
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		command := strings.TrimSpace(scanner.Text())
-		fmt.Println(command, "command received")
+		input := strings.TrimSpace(scanner.Text())
+		command, err := command.BuildCommand(input)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		} else {
+			game.ExecuteCommand(*command)
+		}
+
 		requestCommand()
 	}
 	fmt.Fprintf(os.Stderr, "%s", scanner.Err().Error())
