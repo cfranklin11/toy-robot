@@ -2,11 +2,13 @@ package game
 
 import (
 	"github.com/cfranklin11/toy-robot/internal/command"
+	"github.com/cfranklin11/toy-robot/internal/robot"
 	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
 type Game struct {
 	Table table.Table
+	Robot robot.Robot
 }
 
 func (g Game) ExecuteCommand(command command.Command) command.Command {
@@ -19,5 +21,10 @@ func BuildGame(width, height int) (*Game, error) {
 		return nil, err
 	}
 
-	return &Game{Table: *table}, nil
+	robot, err := robot.BuildRobot()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Game{Table: *table, Robot: *robot}, nil
 }
