@@ -1,6 +1,10 @@
 package table
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/cfranklin11/toy-robot/internal/placement"
+)
 
 type Dimension struct {
 	Measurement int
@@ -16,9 +20,18 @@ func buildDimension(measurement int) (*Dimension, error) {
 	return &Dimension{Measurement: measurement}, nil
 }
 
+const minimumCoordinate = 0
+
 type Table struct {
 	Width  Dimension
 	Height Dimension
+}
+
+func (t Table) Contains(x placement.Coordinate, y placement.Coordinate) bool {
+	return minimumCoordinate <= x.Value &&
+		x.Value <= t.Width.Measurement &&
+		minimumCoordinate <= y.Value &&
+		y.Value <= t.Height.Measurement
 }
 
 const validWidthMeasurement int = 5

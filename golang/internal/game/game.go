@@ -14,7 +14,11 @@ type Game struct {
 	Robot robot.Robot
 }
 
-func (g Game) ExecuteCommand(command command.Command) error {
+func (g *Game) ExecutePlaceCommand(placeCommand command.PlaceCommand) error {
+	return g.Robot.Place(g.Table, placeCommand)
+}
+
+func (g *Game) ExecuteCommand(command command.Command) error {
 	return nil
 }
 
@@ -36,7 +40,16 @@ func StartGame() (*Game, error) {
 	return BuildGame(*table, *robot)
 }
 
-func HandleCommand(game Game, input string) error {
+func HandleCommand(game *Game, input string) error {
+	if command.IsPlaceCommand(input) {
+		command, err := command.BuildPlaceCommand(input)
+		if err != nil {
+			return err
+		}
+
+		return game.ExecutePlaceCommand(*command)
+	}
+
 	command, err := command.BuildCommand(input)
 	if err != nil {
 		return err

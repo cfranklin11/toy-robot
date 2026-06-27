@@ -8,11 +8,9 @@ import (
 	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
-var validTable, _ = table.BuildTable(5, 5)
-var validRobot, _ = robot.BuildRobot()
-var validGame, _ = BuildGame(*validTable, *validRobot)
-
 func TestBuildGame_validDimensions(t *testing.T) {
+	validTable, _ := table.BuildTable(5, 5)
+	validRobot, _ := robot.BuildRobot()
 	game, err := BuildGame(*validTable, *validRobot)
 
 	if err != nil {
@@ -24,6 +22,8 @@ func TestBuildGame_validDimensions(t *testing.T) {
 }
 
 func TestExecuteCommand(t *testing.T) {
+	validTable, _ := table.BuildTable(5, 5)
+	validRobot, _ := robot.BuildRobot()
 	game, _ := BuildGame(*validTable, *validRobot)
 	command, _ := command.BuildCommand("MOVE")
 	game.ExecuteCommand(*command)
@@ -41,9 +41,40 @@ func TestStartGame(t *testing.T) {
 }
 
 func TestHandleCommand_invalidCommand(t *testing.T) {
-	err := HandleCommand(*validGame, "STUFF")
+	validTable, _ := table.BuildTable(5, 5)
+	validRobot, _ := robot.BuildRobot()
+	validGame, _ := BuildGame(*validTable, *validRobot)
+	err := HandleCommand(validGame, "STUFF")
 
 	if err == nil {
 		t.Fatal("expected an error, got nil")
+	}
+}
+
+func TestHandleCommand_validPlaceCommand(t *testing.T) {
+	validTable, _ := table.BuildTable(5, 5)
+	validRobot, _ := robot.BuildRobot()
+	validGame, _ := BuildGame(*validTable, *validRobot)
+	err := HandleCommand(validGame, "PLACE 1, 2, WEST")
+
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	if validGame.Robot.Direction == nil {
+		t.Fatal("expected Robot to be placed, got nil direction")
+	}
+}
+
+func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
+	validTable, _ := table.BuildTable(5, 5)
+	validRobot, _ := robot.BuildRobot()
+	validGame, _ := BuildGame(*validTable, *validRobot)
+	err := HandleCommand(validGame, "PLACE")
+
+	if err == nil {
+		t.Fatal("expected error to be present, got nil")
+	}
+	if validGame.Robot.Direction != nil {
+		t.Fatal("expected Robot to still be unplaced, but direction is present")
 	}
 }
