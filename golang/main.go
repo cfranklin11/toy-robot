@@ -25,9 +25,11 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		input := strings.TrimSpace(scanner.Text())
-		err := game.HandleCommand(*currentGame, input)
+		response, err := game.HandleCommand(currentGame, input)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		} else {
+			fmt.Println(response)
 		}
 
 		requestCommand()
