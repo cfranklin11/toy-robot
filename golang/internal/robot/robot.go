@@ -28,7 +28,7 @@ func (r *Robot) Report() (*string, error) {
 		return nil, fmt.Errorf("Robot must be placed in order to report")
 	}
 
-	report := fmt.Sprintf("%d, %d, %s", r.x.Value, r.y.Value, r.direction.Value)
+	report := fmt.Sprintf("%s, %s, %s", r.x.ToString(), r.y.ToString(), r.direction.ToString())
 	return &report, nil
 }
 

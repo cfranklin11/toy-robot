@@ -6,11 +6,23 @@ import (
 )
 
 type Coordinate struct {
-	Value int
+	value int
+}
+
+func (c *Coordinate) ToString() string {
+	return strconv.Itoa(c.value)
+}
+
+func (c *Coordinate) GreaterThanOrEqualTo(otherCoordinate Coordinate) bool {
+	return c.value >= otherCoordinate.value
 }
 
 type Direction struct {
-	Value string
+	value string
+}
+
+func (d *Direction) ToString() string {
+	return string(d.value)
 }
 
 func BuildCoordinate(strValue string) (*Coordinate, error) {
@@ -22,7 +34,7 @@ func BuildCoordinate(strValue string) (*Coordinate, error) {
 		return nil, fmt.Errorf("Coordinate values must be greater than or equal to 0")
 	}
 
-	return &Coordinate{Value: intValue}, nil
+	return &Coordinate{value: intValue}, nil
 }
 
 var validDirections = map[string]bool{
@@ -38,5 +50,5 @@ func BuildDirection(value string) (*Direction, error) {
 		return nil, fmt.Errorf("%s is not a valid direction", value)
 	}
 
-	return &Direction{Value: value}, nil
+	return &Direction{value: value}, nil
 }

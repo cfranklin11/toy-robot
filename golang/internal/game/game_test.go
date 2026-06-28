@@ -8,7 +8,7 @@ import (
 )
 
 func TestBuildGame_validDimensions(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	game, err := BuildGame(*validTable, *validRobot)
 
@@ -32,7 +32,7 @@ func TestStartGame(t *testing.T) {
 }
 
 func TestHandleCommand_invalidCommand(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	_, err := HandleCommand(validGame, "STUFF")
@@ -43,7 +43,7 @@ func TestHandleCommand_invalidCommand(t *testing.T) {
 }
 
 func TestHandleCommand_validPlaceCommand(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	_, err := HandleCommand(validGame, "PLACE 1, 2, WEST")
@@ -58,7 +58,7 @@ func TestHandleCommand_validPlaceCommand(t *testing.T) {
 }
 
 func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	_, err := HandleCommand(validGame, "PLACE")
@@ -73,7 +73,7 @@ func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
 }
 
 func TestHandleCommand_placeWithLargeCoordinate(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	_, err := HandleCommand(validGame, "PLACE 7, 2, SOUTH")
@@ -88,7 +88,7 @@ func TestHandleCommand_placeWithLargeCoordinate(t *testing.T) {
 }
 
 func TestHandleCommand_reportCommandWhenPlaced(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
@@ -103,7 +103,7 @@ func TestHandleCommand_reportCommandWhenPlaced(t *testing.T) {
 }
 
 func TestHandleCommand_reportCommandWhenUnplaced(t *testing.T) {
-	validTable, _ := table.BuildTable(5, 5)
+	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
 	response, err := HandleCommand(validGame, "REPORT")

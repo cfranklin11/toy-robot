@@ -69,3 +69,51 @@ func TestBuildCoordinate_invalidValue(t *testing.T) {
 		t.Fatalf("expected direction to be nil, got %v", direction)
 	}
 }
+
+func TestCoordinateToString(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	coordinateString := coordinate.ToString()
+
+	if coordinateString != "5" {
+		t.Fatalf("expected coordinate string to be '5', got %s", coordinateString)
+	}
+}
+
+func TestDirectionToString(t *testing.T) {
+	direction, _ := BuildDirection("NORTH")
+	directionString := direction.ToString()
+
+	if directionString != "NORTH" {
+		t.Fatalf("expected direction string to be 'NORTH', got %s", directionString)
+	}
+}
+
+func TestCoordinateGreaterThanOrEqualTo_whenGreater(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	lesserCoordinate, _ := BuildCoordinate("2")
+	isGTE := coordinate.GreaterThanOrEqualTo(*lesserCoordinate)
+
+	if isGTE == false {
+		t.Fatalf("expected coordinate to be greater than or equal, got false")
+	}
+}
+
+func TestCoordinateGreaterThanOrEqualTo_whenEqual(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	equalCoordinate, _ := BuildCoordinate("5")
+	isGTE := coordinate.GreaterThanOrEqualTo(*equalCoordinate)
+
+	if isGTE == false {
+		t.Fatalf("expected coordinate to be greater than or equal, got false")
+	}
+}
+
+func TestCoordinateGreaterThanOrEqualTo_whenLesser(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	greaterCoordinate, _ := BuildCoordinate("8")
+	isGTE := coordinate.GreaterThanOrEqualTo(*greaterCoordinate)
+
+	if isGTE == true {
+		t.Fatalf("expected coordinate not to be greater than or equal, got true")
+	}
+}

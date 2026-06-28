@@ -19,9 +19,8 @@ type Game struct {
 func (g *Game) executePlaceCommand(placeCommand command.PlaceCommand) (*string, error) {
 	if !g.table.Contains(placeCommand.X, placeCommand.Y) {
 		return nil, fmt.Errorf(
-			"Given coordinates do not fit in table with dimensions %d x %d",
-			g.table.Width.Measurement,
-			g.table.Height.Measurement,
+			"Given coordinates do not fit on table with dimensions %s",
+			g.table.Dimensions(),
 		)
 	}
 	g.robot.Place(placeCommand)
@@ -45,7 +44,7 @@ func BuildGame(table table.Table, robot robot.Robot) (*Game, error) {
 }
 
 func StartGame() (*Game, error) {
-	table, err := table.BuildTable(tableWidth, tableHeight)
+	table, err := table.BuildTable()
 	if err != nil {
 		return nil, err
 	}

@@ -6,60 +6,49 @@ import (
 	"github.com/cfranklin11/toy-robot/internal/placement"
 )
 
-type Dimension struct {
-	Measurement int
-}
-
-const minimumMeasurement int = 1
-
-func buildDimension(measurement int) (*Dimension, error) {
-	if measurement < minimumMeasurement {
-		return nil, fmt.Errorf("dimension must have a measurement > 0")
-	}
-
-	return &Dimension{Measurement: measurement}, nil
-}
-
-const minimumCoordinate = 0
-
 type Table struct {
-	Width  Dimension
-	Height Dimension
+	minXCoordinate placement.Coordinate
+	maxXCoordinate placement.Coordinate
+	minYCoordinate placement.Coordinate
+	maxYCoordinate placement.Coordinate
 }
 
 func (t Table) Contains(x placement.Coordinate, y placement.Coordinate) bool {
-	return minimumCoordinate <= x.Value &&
-		x.Value <= t.Width.Measurement &&
-		minimumCoordinate <= y.Value &&
-		y.Value <= t.Height.Measurement
+	return x.GreaterThanOrEqualTo(t.minXCoordinate) &&
+		t.maxXCoordinate.GreaterThanOrEqualTo(x) &&
+		y.GreaterThanOrEqualTo(t.minYCoordinate) &&
+		t.maxYCoordinate.GreaterThanOrEqualTo(y)
 }
 
-const validWidthMeasurement int = 5
+func (t Table) Dimensions() string {
+	return fmt.Sprintf("%s x %s", t.maxXCoordinate.ToString(), t.maxYCoordinate.ToString())
+}
 
-var validWidth Dimension = Dimension{Measurement: validWidthMeasurement}
+const validMinX string = "0"
+const validMaxX string = "5"
+const validMinY string = "0"
+const validMaxY string = "5"
 
-const validHeightMeasurement int = 5
-
-var validHeight Dimension = Dimension{Measurement: validHeightMeasurement}
-
-func BuildTable(widthMeasurement, heightMeasurement int) (*Table, error) {
-	width, err := buildDimension(widthMeasurement)
+func BuildTable() (*Table, error) {
+	minXCoordinate, err := placement.BuildCoordinate(validMinX)
 	if err != nil {
 		return nil, err
 	}
 
-	height, err := buildDimension(heightMeasurement)
+	maxXCoordinate, err := placement.BuildCoordinate(validMaxX)
 	if err != nil {
 		return nil, err
 	}
 
-	if *width != validWidth {
-		return nil, fmt.Errorf("Table width must be %d", validWidth)
+	minYCoordinate, err := placement.BuildCoordinate(validMinY)
+	if err != nil {
+		return nil, err
 	}
 
-	if *height != validHeight {
-		return nil, fmt.Errorf("Table height must be %d", validHeight)
+	maxYCoordinate, err := placement.BuildCoordinate(validMaxY)
+	if err != nil {
+		return nil, err
 	}
 
-	return &Table{Width: *width, Height: *height}, nil
+	return &Table{minXCoordinate: *minXCoordinate, maxXCoordinate: *maxXCoordinate, minYCoordinate: *minYCoordinate, maxYCoordinate: *maxYCoordinate}, nil
 }
