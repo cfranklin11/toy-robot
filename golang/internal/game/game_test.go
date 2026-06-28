@@ -51,8 +51,9 @@ func TestHandleCommand_validPlaceCommand(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
-	if validGame.robot.Direction == nil {
-		t.Fatal("expected Robot to be placed, got nil direction")
+	report, _ := validGame.robot.Report()
+	if report == nil {
+		t.Fatal("expected Robot to be placed, but report was nil")
 	}
 }
 
@@ -65,8 +66,9 @@ func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error to be present, got nil")
 	}
-	if validGame.robot.Direction != nil {
-		t.Fatal("expected Robot to still be unplaced, but direction is present")
+	report, _ := validGame.robot.Report()
+	if report != nil {
+		t.Fatalf("expected Robot not to be placed, but report was %s", *report)
 	}
 }
 
@@ -79,8 +81,9 @@ func TestHandleCommand_placeWithLargeCoordinate(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error to be present, got nil")
 	}
-	if validGame.robot.Direction != nil {
-		t.Fatal("expected Robot to still be unplaced, but direction is present")
+	report, _ := validGame.robot.Report()
+	if report != nil {
+		t.Fatalf("expected Robot not to be placed, but report was %s", *report)
 	}
 }
 

@@ -22,19 +22,15 @@ func TestPlace_validCoordinates(t *testing.T) {
 	x := 1
 	y := 2
 	direction := "SOUTH"
-	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
+	placeString := fmt.Sprintf("%d, %d, %s", x, y, direction)
+	placeCommandString := fmt.Sprintf("PLACE %s", placeString)
+	validPlaceCommand, _ := command.BuildPlaceCommand(placeCommandString)
 	robot, _ := BuildRobot()
 	robot.Place(*validPlaceCommand)
 
-	if robot.X.Value != x {
-		t.Fatalf("expected X-coordinate to be %d, got %d", x, robot.X.Value)
-	}
-	if robot.Y.Value != y {
-		t.Fatalf("expected Y-coordinate to be %d, got %d", y, robot.Y.Value)
-	}
-	if robot.Direction.Value != direction {
-		t.Fatalf("expected direction to be %s, got %s", direction, robot.Direction.Value)
+	report, _ := robot.Report()
+	if *report != placeString {
+		t.Fatalf("expected robot to be placed at %s, got %s", placeString, *report)
 	}
 }
 
