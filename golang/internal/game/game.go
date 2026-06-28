@@ -12,15 +12,19 @@ const tableWidth int = 5
 const tableHeight int = 5
 
 type Game struct {
-	Table table.Table
-	Robot robot.Robot
+	table table.Table
+	robot robot.Robot
 }
 
 func (g *Game) executePlaceCommand(placeCommand command.PlaceCommand) (*string, error) {
-	err := g.Robot.Place(g.Table, placeCommand)
-	if err != nil {
-		return nil, err
+	if !g.table.Contains(placeCommand.X, placeCommand.Y) {
+		return nil, fmt.Errorf(
+			"Given coordinates do not fit in table with dimensions %d x %d",
+			g.table.Width.Measurement,
+			g.table.Height.Measurement,
+		)
 	}
+	g.robot.Place(placeCommand)
 
 	response := ""
 	return &response, nil
@@ -29,7 +33,7 @@ func (g *Game) executePlaceCommand(placeCommand command.PlaceCommand) (*string, 
 func (g *Game) executeCommand(command command.Command) (*string, error) {
 	switch command.Content {
 	case "REPORT":
-		return g.Robot.Report()
+		return g.robot.Report()
 	default:
 		response := ""
 		return &response, fmt.Errorf("Unrecognized command %s", command.Content)
@@ -37,7 +41,7 @@ func (g *Game) executeCommand(command command.Command) (*string, error) {
 }
 
 func BuildGame(table table.Table, robot robot.Robot) (*Game, error) {
-	return &Game{Table: table, Robot: robot}, nil
+	return &Game{table: table, robot: robot}, nil
 }
 
 func StartGame() (*Game, error) {
