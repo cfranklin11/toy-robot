@@ -24,6 +24,8 @@ func (g *Game) executePlaceCommand(placeCommand command.PlaceCommand) (*string, 
 }
 
 func (g *Game) executeCommand(command command.Command) (*string, error) {
+	defaultResponse := ""
+
 	switch command.Content {
 	case "REPORT":
 		return g.robot.Report()
@@ -33,11 +35,16 @@ func (g *Game) executeCommand(command command.Command) (*string, error) {
 			return nil, err
 		}
 
-		response := ""
-		return &response, nil
+		return &defaultResponse, nil
+	case "LEFT":
+		err := g.robot.TurnLeft()
+		if err != nil {
+			return nil, err
+		}
+
+		return &defaultResponse, nil
 	default:
-		response := ""
-		return &response, fmt.Errorf("Unrecognized command %s", command.Content)
+		return &defaultResponse, fmt.Errorf("Unrecognized command %s", command.Content)
 	}
 }
 

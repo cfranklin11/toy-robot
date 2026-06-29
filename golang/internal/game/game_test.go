@@ -111,3 +111,16 @@ func TestHandleCommand_moveCommandAtEdge(t *testing.T) {
 		t.Fatalf("expected response to be nil, got %s", *response)
 	}
 }
+
+func TestHandleCommand_leftCommand(t *testing.T) {
+	validGame := gameFactory()
+	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
+	response, err := HandleCommand(validGame, "LEFT")
+
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	if response == nil {
+		t.Fatal("expected response to be present, got nil")
+	}
+}

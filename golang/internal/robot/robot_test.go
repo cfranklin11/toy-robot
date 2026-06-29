@@ -301,3 +301,25 @@ func TestMove_whenPlaced(t *testing.T) {
 		t.Fatalf("expected placement to be '4, 0, SOUTH', got %s", *report)
 	}
 }
+
+func TestTurnLeft_whenNotPlaced(t *testing.T) {
+	robot, _ := robotFactory(robotOptions{})
+	err := robot.TurnLeft()
+
+	if err == nil {
+		t.Fatal("expected error to be present, got nil")
+	}
+}
+
+func TestTurnLeft_whenPlaced(t *testing.T) {
+	robot, _ := robotFactory(robotOptions{IsPlaced: true})
+	err := robot.TurnLeft()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "4, 1, EAST" {
+		t.Fatalf("expected robot to turn to east, got %s", *report)
+	}
+}

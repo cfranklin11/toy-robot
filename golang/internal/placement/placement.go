@@ -62,3 +62,14 @@ func BuildDirection(value string) (*Direction, error) {
 
 	return &Direction{value: value}, nil
 }
+
+var north, _ = BuildDirection("NORTH")
+var south, _ = BuildDirection("SOUTH")
+var east, _ = BuildDirection("EAST")
+var west, _ = BuildDirection("WEST")
+var Directions = map[string]Direction{
+	"NORTH": *north,
+	"EAST":  *east,
+	"WEST":  *west,
+	"SOUTH": *south,
+}
