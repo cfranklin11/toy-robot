@@ -3,8 +3,8 @@ package robot
 import (
 	"fmt"
 
-	"github.com/cfranklin11/toy-robot/internal/command"
 	"github.com/cfranklin11/toy-robot/internal/placement"
+	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
 type Robot struct {
@@ -13,10 +13,18 @@ type Robot struct {
 	direction *placement.Direction
 }
 
-func (r *Robot) Place(command command.PlaceCommand) {
-	r.x = &command.X
-	r.y = &command.Y
-	r.direction = &command.Direction
+func (r *Robot) Place(x placement.Coordinate, y placement.Coordinate, direction placement.Direction, table table.Table) error {
+	if !table.Contains(x, y) {
+		return fmt.Errorf(
+			"Given coordinates do not fit on table with dimensions %s",
+			table.Dimensions(),
+		)
+	}
+
+	r.x = &x
+	r.y = &y
+	r.direction = &direction
+	return nil
 }
 
 func (r *Robot) isPlaced() bool {
@@ -70,7 +78,7 @@ func (r *Robot) ForwardY() (*placement.Coordinate, error) {
 	}
 }
 
-func (r *Robot) Move() error {
+func (r *Robot) Move(table table.Table) error {
 	forwardX, err := r.ForwardX()
 	if err != nil {
 		return err
@@ -80,6 +88,11 @@ func (r *Robot) Move() error {
 	if err != nil {
 		return err
 	}
+
+	if !table.Contains(*forwardX, *forwardY) {
+		return fmt.Errorf("Robot is at the edge of the table and cannot move")
+	}
+
 	r.x = forwardX
 	r.y = forwardY
 	return nil

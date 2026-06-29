@@ -72,21 +72,6 @@ func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
 	}
 }
 
-func TestHandleCommand_placeWithLargeCoordinate(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
-	_, err := HandleCommand(validGame, "PLACE 7, 2, SOUTH")
-
-	if err == nil {
-		t.Fatal("expected error to be present, got nil")
-	}
-	report, _ := validGame.robot.Report()
-	if report != nil {
-		t.Fatalf("expected Robot not to be placed, but report was %s", *report)
-	}
-}
-
 func TestHandleCommand_reportCommand(t *testing.T) {
 	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()

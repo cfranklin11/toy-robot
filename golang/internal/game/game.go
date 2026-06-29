@@ -14,13 +14,10 @@ type Game struct {
 }
 
 func (g *Game) executePlaceCommand(placeCommand command.PlaceCommand) (*string, error) {
-	if !g.table.Contains(placeCommand.X, placeCommand.Y) {
-		return nil, fmt.Errorf(
-			"Given coordinates do not fit on table with dimensions %s",
-			g.table.Dimensions(),
-		)
+	err := g.robot.Place(placeCommand.X, placeCommand.Y, placeCommand.Direction, g.table)
+	if err != nil {
+		return nil, err
 	}
-	g.robot.Place(placeCommand)
 
 	response := ""
 	return &response, nil
@@ -31,21 +28,7 @@ func (g *Game) executeCommand(command command.Command) (*string, error) {
 	case "REPORT":
 		return g.robot.Report()
 	case "MOVE":
-		forwardX, err := g.robot.ForwardX()
-		if err != nil {
-			return nil, err
-		}
-
-		forwardY, err := g.robot.ForwardY()
-		if err != nil {
-			return nil, err
-		}
-
-		if !g.table.Contains(*forwardX, *forwardY) {
-			return nil, fmt.Errorf("Robot is at the edge of the table and cannot move")
-		}
-
-		err = g.robot.Move()
+		err := g.robot.Move(g.table)
 		if err != nil {
 			return nil, err
 		}
