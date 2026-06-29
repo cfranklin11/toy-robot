@@ -17,6 +17,16 @@ func (c *Coordinate) GreaterThanOrEqualTo(otherCoordinate Coordinate) bool {
 	return c.value >= otherCoordinate.value
 }
 
+func (c *Coordinate) Add(value int) (*Coordinate, error) {
+	sum := c.value + value
+	return BuildCoordinate(strconv.Itoa(sum))
+}
+
+func (c *Coordinate) Subtract(value int) (*Coordinate, error) {
+	sum := c.value - value
+	return BuildCoordinate(strconv.Itoa(sum))
+}
+
 type Direction struct {
 	value string
 }

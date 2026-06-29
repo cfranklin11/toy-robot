@@ -32,6 +32,59 @@ func (r *Robot) Report() (*string, error) {
 	return &report, nil
 }
 
+func (r *Robot) ForwardX() (*placement.Coordinate, error) {
+	if !r.isPlaced() {
+		return nil, fmt.Errorf("Robot must be placed in order to have an x-coordinate")
+	}
+
+	switch r.direction.ToString() {
+	case "NORTH":
+		return r.x, nil
+	case "SOUTH":
+		return r.x, nil
+	case "EAST":
+		return r.x.Add(1)
+	case "WEST":
+		return r.x.Subtract(1)
+	default:
+		return nil, fmt.Errorf("Unknown direction %v", r.direction)
+	}
+}
+
+func (r *Robot) ForwardY() (*placement.Coordinate, error) {
+	if !r.isPlaced() {
+		return nil, fmt.Errorf("Robot must be placed in order to have an x-coordinate")
+	}
+
+	switch r.direction.ToString() {
+	case "NORTH":
+		return r.y.Add(1)
+	case "SOUTH":
+		return r.y.Subtract(1)
+	case "EAST":
+		return r.y, nil
+	case "WEST":
+		return r.y, nil
+	default:
+		return nil, fmt.Errorf("Unknown direction %v", r.direction)
+	}
+}
+
+func (r *Robot) Move() error {
+	forwardX, err := r.ForwardX()
+	if err != nil {
+		return err
+	}
+
+	forwardY, err := r.ForwardY()
+	if err != nil {
+		return err
+	}
+	r.x = forwardX
+	r.y = forwardY
+	return nil
+}
+
 func BuildRobot() (*Robot, error) {
 	return &Robot{}, nil
 }

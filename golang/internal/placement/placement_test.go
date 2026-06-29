@@ -117,3 +117,29 @@ func TestCoordinateGreaterThanOrEqualTo_whenLesser(t *testing.T) {
 		t.Fatalf("expected coordinate not to be greater than or equal, got true")
 	}
 }
+
+func TestCoordinateAdd(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	addedCoordinate, err := coordinate.Add(2)
+	expectedCoordinate, _ := BuildCoordinate("7")
+
+	if err != nil {
+		t.Fatalf("expected err to be nil, got %v", err)
+	}
+	if *addedCoordinate != *expectedCoordinate {
+		t.Fatalf("expected coordinate to be 7, got %v", addedCoordinate)
+	}
+}
+
+func TestCoordinateSubtract(t *testing.T) {
+	coordinate, _ := BuildCoordinate("5")
+	addedCoordinate, err := coordinate.Subtract(2)
+	expectedCoordinate, _ := BuildCoordinate("3")
+
+	if err != nil {
+		t.Fatalf("expected err to be nil, got %v", err)
+	}
+	if *addedCoordinate != *expectedCoordinate {
+		t.Fatalf("expected coordinate to be 3, got %v", addedCoordinate)
+	}
+}

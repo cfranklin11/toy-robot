@@ -87,7 +87,7 @@ func TestHandleCommand_placeWithLargeCoordinate(t *testing.T) {
 	}
 }
 
-func TestHandleCommand_reportCommandWhenPlaced(t *testing.T) {
+func TestHandleCommand_reportCommand(t *testing.T) {
 	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
@@ -102,16 +102,32 @@ func TestHandleCommand_reportCommandWhenPlaced(t *testing.T) {
 	}
 }
 
-func TestHandleCommand_reportCommandWhenUnplaced(t *testing.T) {
+func TestHandleCommand_moveCommand(t *testing.T) {
 	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
 	validGame, _ := BuildGame(*validTable, *validRobot)
-	response, err := HandleCommand(validGame, "REPORT")
+	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
+	response, err := HandleCommand(validGame, "MOVE")
+
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	if response == nil {
+		t.Fatal("expected response to be present, got nil")
+	}
+}
+
+func TestHandleCommand_moveCommandAtEdge(t *testing.T) {
+	validTable, _ := table.BuildTable()
+	validRobot, _ := robot.BuildRobot()
+	validGame, _ := BuildGame(*validTable, *validRobot)
+	HandleCommand(validGame, "PLACE 1, 0, SOUTH")
+	response, err := HandleCommand(validGame, "MOVE")
 
 	if err == nil {
-		t.Fatal("expected error, but got nil")
+		t.Fatal("expected error to be present, but got nil")
 	}
 	if response != nil {
-		t.Fatalf("expected response to be nil, got %v", response)
+		t.Fatalf("expected response to be nil, got %s", *response)
 	}
 }
