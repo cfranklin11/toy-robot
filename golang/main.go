@@ -17,7 +17,7 @@ func main() {
 	fmt.Println("Welcome to Toy Robot!")
 	currentGame, err := game.StartGame()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\nExiting game.\n", err)
+		fmt.Fprintf(os.Stderr, "Error: %s\nExiting game.\n", err.Error())
 		return
 	}
 	requestCommand()
@@ -27,12 +27,15 @@ func main() {
 		input := strings.TrimSpace(scanner.Text())
 		response, err := game.HandleCommand(currentGame, input)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+			fmt.Fprintf(os.Stderr, "Error: %s\n\n", err.Error())
 		} else {
-			fmt.Println(response)
+			fmt.Println(*response)
 		}
 
 		requestCommand()
 	}
-	fmt.Fprintf(os.Stderr, "%s", scanner.Err().Error())
+	err = scanner.Err()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
+	}
 }
