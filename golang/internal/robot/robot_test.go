@@ -9,6 +9,31 @@ import (
 	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
+type robotOptions struct {
+	IsPlaced    bool
+	PlaceString string
+}
+
+func robotFactory(options robotOptions) (*Robot, *table.Table) {
+	robot, _ := BuildRobot()
+
+	if !options.IsPlaced {
+		return robot, nil
+	}
+
+	if options.PlaceString == "" {
+		x := 4
+		y := 1
+		direction := "SOUTH"
+		options.PlaceString = fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
+	}
+
+	validPlaceCommand, _ := command.BuildPlaceCommand(options.PlaceString)
+	table, _ := table.BuildTable()
+	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	return robot, table
+}
+
 func TestBuildRobot(t *testing.T) {
 	robot, err := BuildRobot()
 
@@ -58,27 +83,20 @@ func TestPlace_invalidCoordinates(t *testing.T) {
 }
 
 func TestReport_whenPlaced(t *testing.T) {
-	table, _ := table.BuildTable()
-	x := 0
-	y := 2
-	direction := "SOUTH"
-	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true})
 	report, err := robot.Report()
 
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if *report != "0, 2, SOUTH" {
+	if *report != "4, 1, SOUTH" {
 		t.Fatalf("expected report to be 0, 2, SOUTH, got %v", report)
 	}
 }
 
 func TestReport_whenNotPlaced(t *testing.T) {
-	robot, _ := BuildRobot()
+	robot, _ := robotFactory(robotOptions{})
 	report, err := robot.Report()
 
 	if err == nil {
@@ -91,7 +109,7 @@ func TestReport_whenNotPlaced(t *testing.T) {
 }
 
 func TestForwardX_whenNotPlaced(t *testing.T) {
-	robot, _ := BuildRobot()
+	robot, _ := robotFactory(robotOptions{})
 	coordinate, err := robot.ForwardX()
 
 	if err == nil {
@@ -104,14 +122,11 @@ func TestForwardX_whenNotPlaced(t *testing.T) {
 }
 
 func TestForwardX_facingSouth(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "SOUTH"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{PlaceString: placeString, IsPlaced: true})
 	coordinate, err := robot.ForwardX()
 	expectedCoordinate, _ := placement.BuildCoordinate("4")
 
@@ -125,14 +140,11 @@ func TestForwardX_facingSouth(t *testing.T) {
 }
 
 func TestForwardX_facingNorth(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "NORTH"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardX()
 	expectedCoordinate, _ := placement.BuildCoordinate("4")
 
@@ -146,14 +158,11 @@ func TestForwardX_facingNorth(t *testing.T) {
 }
 
 func TestForwardX_facingEast(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "EAST"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{PlaceString: placeString, IsPlaced: true})
 	coordinate, err := robot.ForwardX()
 	expectedCoordinate, _ := placement.BuildCoordinate("5")
 
@@ -167,14 +176,11 @@ func TestForwardX_facingEast(t *testing.T) {
 }
 
 func TestForwardX_facingWest(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "WEST"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardX()
 	expectedCoordinate, _ := placement.BuildCoordinate("3")
 
@@ -188,7 +194,7 @@ func TestForwardX_facingWest(t *testing.T) {
 }
 
 func TestForwardY_whenNotPlaced(t *testing.T) {
-	robot, _ := BuildRobot()
+	robot, _ := robotFactory(robotOptions{})
 	coordinate, err := robot.ForwardY()
 
 	if err == nil {
@@ -201,14 +207,11 @@ func TestForwardY_whenNotPlaced(t *testing.T) {
 }
 
 func TestForwardY_facingSouth(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "SOUTH"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardY()
 	expectedCoordinate, _ := placement.BuildCoordinate("0")
 
@@ -222,14 +225,11 @@ func TestForwardY_facingSouth(t *testing.T) {
 }
 
 func TestForwardY_facingNorth(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "NORTH"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardY()
 	expectedCoordinate, _ := placement.BuildCoordinate("2")
 
@@ -243,14 +243,11 @@ func TestForwardY_facingNorth(t *testing.T) {
 }
 
 func TestForwardY_facingEast(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "EAST"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardY()
 	expectedCoordinate, _ := placement.BuildCoordinate("1")
 
@@ -264,14 +261,11 @@ func TestForwardY_facingEast(t *testing.T) {
 }
 
 func TestForwardY_facingWest(t *testing.T) {
-	table, _ := table.BuildTable()
 	x := 4
 	y := 1
 	direction := "WEST"
 	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	coordinate, err := robot.ForwardY()
 	expectedCoordinate, _ := placement.BuildCoordinate("1")
 
@@ -286,7 +280,7 @@ func TestForwardY_facingWest(t *testing.T) {
 
 func TestMove_whenNotPlaced(t *testing.T) {
 	table, _ := table.BuildTable()
-	robot, _ := BuildRobot()
+	robot, _ := robotFactory(robotOptions{})
 	err := robot.Move(*table)
 
 	if err == nil {
@@ -295,14 +289,7 @@ func TestMove_whenNotPlaced(t *testing.T) {
 }
 
 func TestMove_whenPlaced(t *testing.T) {
-	table, _ := table.BuildTable()
-	x := 4
-	y := 1
-	direction := "SOUTH"
-	placeString := fmt.Sprintf("PLACE %d, %d, %s", x, y, direction)
-	validPlaceCommand, _ := command.BuildPlaceCommand(placeString)
-	robot, _ := BuildRobot()
-	robot.Place(validPlaceCommand.X, validPlaceCommand.Y, validPlaceCommand.Direction, *table)
+	robot, table := robotFactory(robotOptions{IsPlaced: true})
 	err := robot.Move(*table)
 	report, _ := robot.Report()
 

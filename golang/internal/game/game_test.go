@@ -7,6 +7,13 @@ import (
 	"github.com/cfranklin11/toy-robot/internal/table"
 )
 
+func gameFactory() *Game {
+	validTable, _ := table.BuildTable()
+	validRobot, _ := robot.BuildRobot()
+	validGame, _ := BuildGame(*validTable, *validRobot)
+	return validGame
+}
+
 func TestBuildGame_validDimensions(t *testing.T) {
 	validTable, _ := table.BuildTable()
 	validRobot, _ := robot.BuildRobot()
@@ -32,9 +39,7 @@ func TestStartGame(t *testing.T) {
 }
 
 func TestHandleCommand_invalidCommand(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	_, err := HandleCommand(validGame, "STUFF")
 
 	if err == nil {
@@ -43,9 +48,7 @@ func TestHandleCommand_invalidCommand(t *testing.T) {
 }
 
 func TestHandleCommand_validPlaceCommand(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	_, err := HandleCommand(validGame, "PLACE 1, 2, WEST")
 
 	if err != nil {
@@ -58,9 +61,7 @@ func TestHandleCommand_validPlaceCommand(t *testing.T) {
 }
 
 func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	_, err := HandleCommand(validGame, "PLACE")
 
 	if err == nil {
@@ -73,9 +74,7 @@ func TestHandleCommand_invalidPlaceCommand(t *testing.T) {
 }
 
 func TestHandleCommand_reportCommand(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
 	response, err := HandleCommand(validGame, "REPORT")
 
@@ -88,9 +87,7 @@ func TestHandleCommand_reportCommand(t *testing.T) {
 }
 
 func TestHandleCommand_moveCommand(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
 	response, err := HandleCommand(validGame, "MOVE")
 
@@ -103,9 +100,7 @@ func TestHandleCommand_moveCommand(t *testing.T) {
 }
 
 func TestHandleCommand_moveCommandAtEdge(t *testing.T) {
-	validTable, _ := table.BuildTable()
-	validRobot, _ := robot.BuildRobot()
-	validGame, _ := BuildGame(*validTable, *validRobot)
+	validGame := gameFactory()
 	HandleCommand(validGame, "PLACE 1, 0, SOUTH")
 	response, err := HandleCommand(validGame, "MOVE")
 
