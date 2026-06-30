@@ -124,3 +124,40 @@ func TestHandleCommand_leftCommand(t *testing.T) {
 		t.Fatal("expected response to be present, got nil")
 	}
 }
+
+func TestHandleCommand_leftCommandUnplaced(t *testing.T) {
+	validGame := gameFactory()
+	response, err := HandleCommand(validGame, "LEFT")
+
+	if err == nil {
+		t.Fatal("expected error to be present, but got nil")
+	}
+	if response != nil {
+		t.Fatalf("expected no response, got %s", *response)
+	}
+}
+
+func TestHandleCommand_rightCommand(t *testing.T) {
+	validGame := gameFactory()
+	HandleCommand(validGame, "PLACE 1, 2, SOUTH")
+	response, err := HandleCommand(validGame, "RIGHT")
+
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	if response == nil {
+		t.Fatal("expected response to be present, got nil")
+	}
+}
+
+func TestHandleCommand_rightCommandUnplaced(t *testing.T) {
+	validGame := gameFactory()
+	response, err := HandleCommand(validGame, "RIGHT")
+
+	if err == nil {
+		t.Fatal("expected error to be present, but got nil")
+	}
+	if response != nil {
+		t.Fatalf("expected no response, got %s", *response)
+	}
+}

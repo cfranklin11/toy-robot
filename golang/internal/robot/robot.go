@@ -114,6 +114,22 @@ func (r *Robot) TurnLeft() error {
 	return nil
 }
 
+func (r *Robot) TurnRight() error {
+	turnLeftMap := map[placement.Direction]placement.Direction{
+		placement.Directions["NORTH"]: placement.Directions["EAST"],
+		placement.Directions["SOUTH"]: placement.Directions["WEST"],
+		placement.Directions["EAST"]:  placement.Directions["SOUTH"],
+		placement.Directions["WEST"]:  placement.Directions["NORTH"],
+	}
+	if !r.isPlaced() {
+		return fmt.Errorf("Robot must be placed in order to turn left")
+	}
+
+	newDirection := turnLeftMap[*r.direction]
+	r.direction = &newDirection
+	return nil
+}
+
 func BuildRobot() (*Robot, error) {
 	return &Robot{}, nil
 }

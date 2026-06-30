@@ -43,6 +43,13 @@ func (g *Game) executeCommand(command command.Command) (*string, error) {
 		}
 
 		return &defaultResponse, nil
+	case "RIGHT":
+		err := g.robot.TurnRight()
+		if err != nil {
+			return nil, err
+		}
+
+		return &defaultResponse, nil
 	default:
 		return &defaultResponse, fmt.Errorf("Unrecognized command %s", command.Content)
 	}

@@ -311,15 +311,123 @@ func TestTurnLeft_whenNotPlaced(t *testing.T) {
 	}
 }
 
-func TestTurnLeft_whenPlaced(t *testing.T) {
-	robot, _ := robotFactory(robotOptions{IsPlaced: true})
+func TestTurnLeft_facingNorth(t *testing.T) {
+	placeString := "PLACE 1, 1, NORTH"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
 	err := robot.TurnLeft()
 	report, _ := robot.Report()
 
 	if err != nil {
 		t.Fatalf("expected error to be nil, got %v", err)
 	}
-	if *report != "4, 1, EAST" {
+	if *report != "1, 1, WEST" {
+		t.Fatalf("expected robot to turn to west, got %s", *report)
+	}
+}
+
+func TestTurnLeft_facingSouth(t *testing.T) {
+	placeString := "PLACE 1, 1, SOUTH"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnLeft()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, EAST" {
 		t.Fatalf("expected robot to turn to east, got %s", *report)
+	}
+}
+
+func TestTurnLeft_facingEast(t *testing.T) {
+	placeString := "PLACE 1, 1, EAST"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnLeft()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, NORTH" {
+		t.Fatalf("expected robot to turn to north, got %s", *report)
+	}
+}
+
+func TestTurnLeft_facingWest(t *testing.T) {
+	placeString := "PLACE 1, 1, WEST"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnLeft()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, SOUTH" {
+		t.Fatalf("expected robot to turn to south, got %s", *report)
+	}
+}
+
+func TestTurnRight_whenNotPlaced(t *testing.T) {
+	robot, _ := robotFactory(robotOptions{})
+	err := robot.TurnRight()
+
+	if err == nil {
+		t.Fatal("expected error to be present, got nil")
+	}
+}
+
+func TestTurnRight_facingNorth(t *testing.T) {
+	placeString := "PLACE 1, 1, NORTH"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnRight()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, EAST" {
+		t.Fatalf("expected robot to turn to east, got %s", *report)
+	}
+}
+
+func TestTurnRight_facingSouth(t *testing.T) {
+	placeString := "PLACE 1, 1, SOUTH"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnRight()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, WEST" {
+		t.Fatalf("expected robot to turn to west, got %s", *report)
+	}
+}
+
+func TestTurnRight_facingEast(t *testing.T) {
+	placeString := "PLACE 1, 1, EAST"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnRight()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, SOUTH" {
+		t.Fatalf("expected robot to turn to south, got %s", *report)
+	}
+}
+
+func TestTurnRight_facingWest(t *testing.T) {
+	placeString := "PLACE 1, 1, WEST"
+	robot, _ := robotFactory(robotOptions{IsPlaced: true, PlaceString: placeString})
+	err := robot.TurnRight()
+	report, _ := robot.Report()
+
+	if err != nil {
+		t.Fatalf("expected error to be nil, got %v", err)
+	}
+	if *report != "1, 1, NORTH" {
+		t.Fatalf("expected robot to turn to north, got %s", *report)
 	}
 }
